@@ -1,0 +1,35 @@
+{
+    "name": "slam/flysystem-single-encrypted-ziparchive",
+    "type": "library",
+    "description": "FlySystem adapter to store content into single encrypted zips",
+    "homepage": "https://github.com/slamdunk/flysystem-single-encrypted-ziparchive",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Filippo Tessarotto",
+            "email": "zoeslam@gmail.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=8.0",
+        "league/flysystem": "^2.3.0"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^v3.2.1",
+        "infection/infection": "^0.25.3",
+        "malukenho/mcbumpface": "^1.1.5",
+        "phpunit/phpunit": "^9.5.10",
+        "vimeo/psalm": "^4.11.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "SlamFlysystemSingleEncryptedZiparchive\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "SlamFlysystemSingleEncryptedZiparchiveTest\\": "test/"
+        }
+    }
+}
