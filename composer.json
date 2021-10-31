@@ -24,12 +24,12 @@
     },
     "autoload": {
         "psr-4": {
-            "SlamFlysystemSingleEncryptedZiparchive\\": "src/"
+            "SlamFlysystemSingleEncryptedZipArchive\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "SlamFlysystemSingleEncryptedZiparchiveTest\\": "test/"
+            "SlamFlysystemSingleEncryptedZipArchiveTest\\": "test/"
         }
     }
 }
