@@ -20,7 +20,8 @@
         "infection/infection": "^0.25.3",
         "malukenho/mcbumpface": "^1.1.5",
         "phpunit/phpunit": "^9.5.10",
-        "vimeo/psalm": "^4.11.2"
+        "vimeo/psalm": "^4.11.2",
+        "league/flysystem-adapter-test-utilities": "^2.2.1"
     },
     "autoload": {
         "psr-4": {

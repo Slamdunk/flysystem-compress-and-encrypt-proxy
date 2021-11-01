@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace SlamFlysystemSingleEncryptedZipArchiveTest;
 
-use PHPUnit\Framework\TestCase;
+use League\Flysystem\AdapterTestUtilities\FilesystemAdapterTestCase;
 use SlamFlysystemSingleEncryptedZipArchive\SingleEncryptedZipArchiveAdapter;
 
 /**
@@ -12,6 +12,6 @@ use SlamFlysystemSingleEncryptedZipArchive\SingleEncryptedZipArchiveAdapter;
  *
  * @internal
  */
-final class SingleEncryptedZipArchiveAdapterTest extends TestCase
+final class SingleEncryptedZipArchiveAdapterTest extends FilesystemAdapterTestCase
 {
 }
