@@ -7,15 +7,18 @@ namespace SlamFlysystemSingleEncryptedZipArchive;
 use League\Flysystem\Config;
 use League\Flysystem\FileAttributes;
 use League\Flysystem\FilesystemAdapter;
-use League\Flysystem\Local\LocalFilesystemAdapter;
+use ZipArchive;
 
 final class SingleEncryptedZipArchiveAdapter implements FilesystemAdapter
 {
     public function __construct(
-        private FilesystemAdapter $realAdapter,
+        private FilesystemAdapter $remoteAdapter,
         private string $password,
-        private LocalFilesystemAdapter $propAdapter
+        private string $localWorkingDirectory
     ) {
+        if (!is_dir($localWorkingDirectory) || !is_writable($localWorkingDirectory)) {
+            throw new UnableToWriteToDirectoryException("{$localWorkingDirectory} is not writable");
+        }
     }
 
     public static function generateKey(): string
@@ -28,7 +31,7 @@ final class SingleEncryptedZipArchiveAdapter implements FilesystemAdapter
      */
     public function fileExists(string $path): bool
     {
-        return $this->realAdapter->fileExists($path);
+        return $this->remoteAdapter->fileExists($this->getRemotePath($path));
     }
 
     /**
@@ -36,7 +39,9 @@ final class SingleEncryptedZipArchiveAdapter implements FilesystemAdapter
      */
     public function write(string $path, string $contents, Config $config): void
     {
-        $this->realAdapter->write($path, $contents, $config);
+        $localZipPath = $this->writeToLocalZip($path, $contents);
+
+        $this->remoteAdapter->write($this->getRemotePath($path), file_get_contents($localZipPath), $config);
     }
 
     /**
@@ -44,7 +49,9 @@ final class SingleEncryptedZipArchiveAdapter implements FilesystemAdapter
      */
     public function writeStream(string $path, $contents, Config $config): void
     {
-        $this->realAdapter->writeStream($path, $contents, $config);
+        $localZipPath = $this->writeToLocalZip($path, stream_get_contents($contents));
+
+        $this->remoteAdapter->writeStream($this->getRemotePath($path), fopen($localZipPath, 'r'), $config);
     }
 
     /**
@@ -52,7 +59,9 @@ final class SingleEncryptedZipArchiveAdapter implements FilesystemAdapter
      */
     public function read(string $path): string
     {
-        return $this->realAdapter->read($path);
+        $zipStream = $this->readZipStream($path);
+
+        return $this->remoteAdapter->read(stream_get_contents($zipStream));
     }
 
     /**
@@ -60,7 +69,7 @@ final class SingleEncryptedZipArchiveAdapter implements FilesystemAdapter
      */
     public function readStream(string $path)
     {
-        return $this->realAdapter->readStream($path);
+        return $this->readZipStream($path);
     }
 
     /**
@@ -68,7 +77,7 @@ final class SingleEncryptedZipArchiveAdapter implements FilesystemAdapter
      */
     public function delete(string $path): void
     {
-        $this->realAdapter->delete($path);
+        $this->remoteAdapter->delete($path);
     }
 
     /**
@@ -76,7 +85,7 @@ final class SingleEncryptedZipArchiveAdapter implements FilesystemAdapter
      */
     public function deleteDirectory(string $path): void
     {
-        $this->realAdapter->deleteDirectory($path);
+        $this->remoteAdapter->deleteDirectory($path);
     }
 
     /**
@@ -84,7 +93,7 @@ final class SingleEncryptedZipArchiveAdapter implements FilesystemAdapter
      */
     public function createDirectory(string $path, Config $config): void
     {
-        $this->realAdapter->createDirectory($path, $config);
+        $this->remoteAdapter->createDirectory($path, $config);
     }
 
     /**
@@ -92,7 +101,7 @@ final class SingleEncryptedZipArchiveAdapter implements FilesystemAdapter
      */
     public function setVisibility(string $path, string $visibility): void
     {
-        $this->realAdapter->setVisibility($path, $visibility);
+        $this->remoteAdapter->setVisibility($path, $visibility);
     }
 
     /**
@@ -100,7 +109,7 @@ final class SingleEncryptedZipArchiveAdapter implements FilesystemAdapter
      */
     public function visibility(string $path): FileAttributes
     {
-        return $this->realAdapter->visibility($path);
+        return $this->remoteAdapter->visibility($path);
     }
 
     /**
@@ -108,7 +117,7 @@ final class SingleEncryptedZipArchiveAdapter implements FilesystemAdapter
      */
     public function mimeType(string $path): FileAttributes
     {
-        return $this->realAdapter->mimeType($path);
+        return $this->remoteAdapter->mimeType($path);
     }
 
     /**
@@ -116,7 +125,7 @@ final class SingleEncryptedZipArchiveAdapter implements FilesystemAdapter
      */
     public function lastModified(string $path): FileAttributes
     {
-        return $this->realAdapter->lastModified($path);
+        return $this->remoteAdapter->lastModified($path);
     }
 
     /**
@@ -124,7 +133,7 @@ final class SingleEncryptedZipArchiveAdapter implements FilesystemAdapter
      */
     public function fileSize(string $path): FileAttributes
     {
-        return $this->realAdapter->fileSize($path);
+        return $this->remoteAdapter->fileSize($path);
     }
 
     /**
@@ -132,7 +141,7 @@ final class SingleEncryptedZipArchiveAdapter implements FilesystemAdapter
      */
     public function listContents(string $path, bool $deep): iterable
     {
-        return $this->realAdapter->listContents($path, $deep);
+        return $this->remoteAdapter->listContents($path, $deep);
     }
 
     /**
@@ -140,7 +149,7 @@ final class SingleEncryptedZipArchiveAdapter implements FilesystemAdapter
      */
     public function move(string $source, string $destination, Config $config): void
     {
-        $this->realAdapter->move($source, $destination, $config);
+        $this->remoteAdapter->move($source, $destination, $config);
     }
 
     /**
@@ -148,6 +157,42 @@ final class SingleEncryptedZipArchiveAdapter implements FilesystemAdapter
      */
     public function copy(string $source, string $destination, Config $config): void
     {
-        $this->realAdapter->copy($source, $destination, $config);
+        $this->remoteAdapter->copy($source, $destination, $config);
+    }
+
+    private function writeToLocalZip(string $path, string $contents): string
+    {
+        $localZipPath = $this->getLocalZipPath($path);
+        $basename = basename($path);
+        $zip = new ZipArchive();
+        $zip->open($localZipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE);
+        $zip->addFromString($basename, $contents);
+        $zip->close();
+
+        return $localZipPath;
+    }
+
+    /**
+     * @return resource
+     */
+    private function readZipStream(string $path)
+    {
+        $localZipPath = $this->getLocalZipPath($path);
+        $zip = new ZipArchive();
+        $zip->open($localZipPath, ZipArchive::CHECKCONS);
+        $stream = $zip->getStream(basename($path));
+        $zip->close();
+
+        return $stream;
+    }
+
+    private function getRemotePath(string $path): string
+    {
+        return $path.'.zip';
+    }
+
+    private function getLocalZipPath(string $path): string
+    {
+        return $this->localWorkingDirectory.\DIRECTORY_SEPARATOR.sha1($path).'_'.basename($path).'.zip';
     }
 }

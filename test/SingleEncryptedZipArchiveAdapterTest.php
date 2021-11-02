@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace SlamFlysystemSingleEncryptedZipArchiveTest;
 
 use League\Flysystem\AdapterTestUtilities\FilesystemAdapterTestCase;
+use League\Flysystem\Config;
 use League\Flysystem\FilesystemAdapter;
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use SlamFlysystemSingleEncryptedZipArchive\SingleEncryptedZipArchiveAdapter;
+use SlamFlysystemSingleEncryptedZipArchive\UnableToWriteToDirectoryException;
+use ZipArchive;
 
 /**
  * @covers \SlamFlysystemSingleEncryptedZipArchive\SingleEncryptedZipArchiveAdapter
@@ -19,11 +22,15 @@ final class SingleEncryptedZipArchiveAdapterTest extends FilesystemAdapterTestCa
     private const REMOTE_MOCK = __DIR__.'/assets/remote-mock';
     private const LOCAL_WORKDIR = __DIR__.'/assets/local-workdir';
 
+    private static string $zipPassword;
+
     protected function setUp(): void
     {
         reset_function_mocks();
         delete_directory(static::REMOTE_MOCK);
         delete_directory(static::LOCAL_WORKDIR);
+
+        mkdir(static::LOCAL_WORKDIR, 0700, true);
     }
 
     protected function tearDown(): void
@@ -31,6 +38,22 @@ final class SingleEncryptedZipArchiveAdapterTest extends FilesystemAdapterTestCa
         reset_function_mocks();
         delete_directory(static::REMOTE_MOCK);
         delete_directory(static::LOCAL_WORKDIR);
+    }
+
+    /**
+     * @test
+     */
+    public function local_directory_must_be_writable(): void
+    {
+        chmod(static::LOCAL_WORKDIR, 0500);
+
+        $this->expectException(UnableToWriteToDirectoryException::class);
+
+        new SingleEncryptedZipArchiveAdapter(
+            $this->createMock(FilesystemAdapter::class),
+            SingleEncryptedZipArchiveAdapter::generateKey(),
+            self::LOCAL_WORKDIR
+        );
     }
 
     /**
@@ -69,7 +92,7 @@ final class SingleEncryptedZipArchiveAdapterTest extends FilesystemAdapterTestCa
         $adapter = new SingleEncryptedZipArchiveAdapter(
             $remoteMock,
             SingleEncryptedZipArchiveAdapter::generateKey(),
-            new LocalFilesystemAdapter(self::LOCAL_WORKDIR)
+            self::LOCAL_WORKDIR
         );
 
         $path = uniqid('path_');
@@ -82,12 +105,31 @@ final class SingleEncryptedZipArchiveAdapterTest extends FilesystemAdapterTestCa
         $adapter->deleteDirectory($path);
     }
 
+    /**
+     * @test
+     */
+    public function writing_a_file_writes_a_password_secured_zip(): void
+    {
+        $adapter = $this->adapter();
+
+        $contents = uniqid('contents_');
+        $adapter->write('/file.txt', $contents, new Config());
+
+        static::assertFileExists(static::REMOTE_MOCK.'/file.txt.zip');
+        static::assertFileDoesNotExist(static::REMOTE_MOCK.'/file.txt');
+
+        $zip = new ZipArchive();
+        $zip->open(static::REMOTE_MOCK.'/file.txt.zip', ZipArchive::RDONLY | ZipArchive::CHECKCONS);
+
+        static::assertSame(1, $zip->numFiles);
+    }
+
     protected static function createFilesystemAdapter(): FilesystemAdapter
     {
         return new SingleEncryptedZipArchiveAdapter(
             new LocalFilesystemAdapter(self::REMOTE_MOCK),
             SingleEncryptedZipArchiveAdapter::generateKey(),
-            new LocalFilesystemAdapter(self::LOCAL_WORKDIR)
+            self::LOCAL_WORKDIR
         );
     }
 }
