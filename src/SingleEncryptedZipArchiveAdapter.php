@@ -7,14 +7,11 @@ namespace SlamFlysystemSingleEncryptedZipArchive;
 use League\Flysystem\Config;
 use League\Flysystem\FileAttributes;
 use League\Flysystem\FilesystemAdapter;
-use League\MimeTypeDetection\ExtensionMimeTypeDetector;
-use League\MimeTypeDetection\MimeTypeDetector;
 use ZipArchive;
 
 final class SingleEncryptedZipArchiveAdapter implements FilesystemAdapter
 {
     private ZipArchive $zip;
-    private MimeTypeDetector $mimeTypeDetector;
 
     public function __construct(
         private FilesystemAdapter $remoteAdapter,
@@ -26,7 +23,6 @@ final class SingleEncryptedZipArchiveAdapter implements FilesystemAdapter
         }
 
         $this->zip = new ZipArchive();
-        $this->mimeTypeDetector = new ExtensionMimeTypeDetector();
     }
 
     public static function generateKey(): string
