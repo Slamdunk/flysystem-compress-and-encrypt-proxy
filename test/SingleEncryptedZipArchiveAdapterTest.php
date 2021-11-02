@@ -49,7 +49,7 @@ final class SingleEncryptedZipArchiveAdapterTest extends FilesystemAdapterTestCa
      */
     public function generate_long_enough_key(): void
     {
-        static::assertSame(44, \strlen(SingleEncryptedZipArchiveAdapter::generateKey()));
+        static::assertGreaterThan(43, \strlen(SingleEncryptedZipArchiveAdapter::generateKey()));
     }
 
     /**

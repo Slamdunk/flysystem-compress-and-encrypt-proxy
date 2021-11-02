@@ -26,4 +26,5 @@ code-coverage: test
 	php -d zend.assertions=1 vendor/bin/infection \
 		--threads=$(shell nproc) \
 		--coverage=coverage \
-		--skip-initial-tests
+		--skip-initial-tests \
+	|| cat infections.log
