@@ -13,9 +13,14 @@
     },
     "mutators": {
         "@default": true,
+        "IncrementInteger": {
+            "ignoreSourceCodeByRegex": [
+                ".+random_bytes\\(\\d+\\).+"
+            ]
+        },
         "DecrementInteger": {
             "ignoreSourceCodeByRegex": [
-                ".+random_bytes(\\d+).+"
+                ".+random_bytes\\(\\d+\\).+"
             ]
         }
     },
