@@ -19,7 +19,7 @@
     </report>
   </coverage>
   <testsuites>
-    <testsuite name="Slam php-symmetric-encryption">
+    <testsuite name="Slam flysystem-single-encrypted-ziparchive">
       <directory>./test/</directory>
     </testsuite>
   </testsuites>
