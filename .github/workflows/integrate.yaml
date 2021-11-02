@@ -102,7 +102,7 @@ jobs:
 
       - name: "Infection"
         timeout-minutes: 10
-        run: "vendor/bin/infection --ansi --threads=$(nproc) --coverage=coverage --skip-initial-tests || cat infections.log"
+        run: "vendor/bin/infection --ansi --threads=$(nproc) --coverage=coverage --skip-initial-tests || (cat infections.log && false)"
         env:
           INFECTION_BADGE_API_KEY: ${{ secrets.INFECTION_BADGE_API_KEY }}
 

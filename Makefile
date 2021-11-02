@@ -27,4 +27,4 @@ code-coverage: test
 		--threads=$(shell nproc) \
 		--coverage=coverage \
 		--skip-initial-tests \
-	|| cat infections.log
+	|| (cat infections.log && false)
