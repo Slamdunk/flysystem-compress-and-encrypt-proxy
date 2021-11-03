@@ -289,7 +289,7 @@ final class SingleEncryptedZipArchiveAdapterTest extends FilesystemAdapterTestCa
 
         static::assertCount(1, glob($this->localWorkdir.'/*.zip'));
 
-        $adapter->clearLocalWorkingDirectory();
+        $adapter->__destruct();
 
         static::assertCount(0, glob($this->localWorkdir.'/*.zip'));
     }

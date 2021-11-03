@@ -32,16 +32,16 @@ final class SingleEncryptedZipArchiveAdapter implements FilesystemAdapter
         $this->zip = new ZipArchive();
     }
 
+    public function __destruct()
+    {
+        foreach (glob($this->localWorkingDirectory.\DIRECTORY_SEPARATOR.'*.zip') as $file) {
+            @unlink($file);
+        }
+    }
+
     public static function generateKey(): string
     {
         return base64_encode(random_bytes(32));
-    }
-
-    public function clearLocalWorkingDirectory(): void
-    {
-        foreach (glob($this->localWorkingDirectory.\DIRECTORY_SEPARATOR.'*.zip') as $file) {
-            unlink($file);
-        }
     }
 
     /**
