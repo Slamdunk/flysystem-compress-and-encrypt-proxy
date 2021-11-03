@@ -13,6 +13,11 @@
     },
     "mutators": {
         "@default": true,
+        "BitwiseOr": {
+            "ignoreSourceCodeByRegex": [
+                ".+ZipArchive::RDONLY . ZipArchive::CHECKCONS.+"
+            ]
+        },
         "IncrementInteger": {
             "ignoreSourceCodeByRegex": [
                 ".+random_bytes\\(\\d+\\).+"

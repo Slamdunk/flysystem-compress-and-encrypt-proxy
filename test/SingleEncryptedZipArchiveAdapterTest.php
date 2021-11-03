@@ -13,6 +13,7 @@ use RuntimeException;
 use SlamFlysystemSingleEncryptedZipArchive\SingleEncryptedZipArchiveAdapter;
 use SlamFlysystemSingleEncryptedZipArchive\UnableToWriteToDirectoryException;
 use SlamFlysystemSingleEncryptedZipArchive\UnsupportedOperationException;
+use SlamFlysystemSingleEncryptedZipArchive\WeakPasswordException;
 use ZipArchive;
 
 /**
@@ -58,6 +59,20 @@ final class SingleEncryptedZipArchiveAdapterTest extends FilesystemAdapterTestCa
         }
 
         return $this->customAdapter;
+    }
+
+    /**
+     * @test
+     */
+    public function accept_non_trivial_password_only(): void
+    {
+        $this->expectException(WeakPasswordException::class);
+
+        new SingleEncryptedZipArchiveAdapter(
+            $this->createMock(FilesystemAdapter::class),
+            'foo',
+            $this->localWorkdir
+        );
     }
 
     /**
@@ -160,7 +175,7 @@ final class SingleEncryptedZipArchiveAdapterTest extends FilesystemAdapterTestCa
 
         $attributes = $adapter->fileSize('path.txt');
         static::assertInstanceOf(FileAttributes::class, $attributes);
-        static::assertSame(122, $attributes->fileSize());
+        static::assertSame(172, $attributes->fileSize());
     }
 
     /**
@@ -218,6 +233,11 @@ final class SingleEncryptedZipArchiveAdapterTest extends FilesystemAdapterTestCa
         $zip->open($this->remoteMock.'/file.txt.zip', ZipArchive::RDONLY | ZipArchive::CHECKCONS);
 
         static::assertSame(1, $zip->numFiles);
+        static::assertSame('file.txt', $zip->getNameIndex(0));
+
+        static::assertFalse($zip->getFromIndex(0));
+        $zip->setPassword($this->zipPassword);
+        static::assertSame($contents, $zip->getFromIndex(0));
     }
 
     protected static function createFilesystemAdapter(): FilesystemAdapter
