@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace SlamFlysystemSingleEncryptedZipArchive;
+namespace SlamFlysystemEncryptedZipProxy;
 
 use RuntimeException;
 
-final class UnableToWriteToDirectoryException extends RuntimeException implements SingleEncryptedZipArchiveException
+final class UnableToWriteToDirectoryException extends RuntimeException implements EncryptedZipProxyException
 {
 }

@@ -21,11 +21,11 @@ $ composer require slam/flysystem-encrypted-zip-proxy
 
 ```php
 
-use SlamFlysystemSingleEncryptedZipArchive\SingleEncryptedZipArchiveAdapter;
+use SlamFlysystemEncryptedZipProxy\EncryptedZipProxyAdapter;
 use League\Flysystem\AwsS3V3\AwsS3V3Adapter;
 
 // Create a strong password and save it somewhere
-$password = SingleEncryptedZipArchiveAdapter::generateKey();
+$password = EncryptedZipProxyAdapter::generateKey();
 
 // Create the final FilesystemAdapter
 $remoteAdapter = new AwsS3V3Adapter(/* ... */);
@@ -34,7 +34,7 @@ $remoteAdapter = new AwsS3V3Adapter(/* ... */);
 // before sending it
 $localWorkingDirectory = sys_get_temp_dir();
 
-$adapter = new SingleEncryptedZipArchiveAdapter(
+$adapter = new EncryptedZipProxyAdapter(
     $remoteAdapter,
     $password,
     $localWorkingDirectory

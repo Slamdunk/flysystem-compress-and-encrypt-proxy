@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <files psalm-version="4.11.2@6fba5eb554f9507b72932f9c75533d8af593688d">
-  <file src="test/SingleEncryptedZipArchiveAdapterTest.php">
+  <file src="test/EncryptedZipProxyAdapterTest.php">
     <PropertyNotSetInConstructor occurrences="6">
       <code>$localWorkdir</code>
       <code>$remoteMock</code>
       <code>$zipPassword</code>
-      <code>SingleEncryptedZipArchiveAdapterTest</code>
-      <code>SingleEncryptedZipArchiveAdapterTest</code>
-      <code>SingleEncryptedZipArchiveAdapterTest</code>
+      <code>EncryptedZipProxyAdapterTest</code>
+      <code>EncryptedZipProxyAdapterTest</code>
+      <code>EncryptedZipProxyAdapterTest</code>
     </PropertyNotSetInConstructor>
   </file>
 </files>

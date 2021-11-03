@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace SlamFlysystemSingleEncryptedZipArchive;
+namespace SlamFlysystemEncryptedZipProxy;
 
 use League\Flysystem\Config;
 use League\Flysystem\FileAttributes;
 use League\Flysystem\FilesystemAdapter;
 use ZipArchive;
 
-final class SingleEncryptedZipArchiveAdapter implements FilesystemAdapter
+final class EncryptedZipProxyAdapter implements FilesystemAdapter
 {
     private ZipArchive $zip;
 

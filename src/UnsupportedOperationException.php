@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace SlamFlysystemSingleEncryptedZipArchive;
+namespace SlamFlysystemEncryptedZipProxy;
 
 use RuntimeException;
 
-final class UnsupportedOperationException extends RuntimeException implements SingleEncryptedZipArchiveException
+final class UnsupportedOperationException extends RuntimeException implements EncryptedZipProxyException
 {
 }

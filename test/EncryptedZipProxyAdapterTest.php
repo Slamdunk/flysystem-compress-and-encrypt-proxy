@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace SlamFlysystemSingleEncryptedZipArchiveTest;
+namespace SlamFlysystemEncryptedZipProxyTest;
 
 use League\Flysystem\AdapterTestUtilities\FilesystemAdapterTestCase;
 use League\Flysystem\Config;
@@ -10,21 +10,21 @@ use League\Flysystem\FileAttributes;
 use League\Flysystem\FilesystemAdapter;
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use RuntimeException;
-use SlamFlysystemSingleEncryptedZipArchive\SingleEncryptedZipArchiveAdapter;
-use SlamFlysystemSingleEncryptedZipArchive\UnableToWriteFileException;
-use SlamFlysystemSingleEncryptedZipArchive\UnableToWriteToDirectoryException;
-use SlamFlysystemSingleEncryptedZipArchive\UnsupportedOperationException;
-use SlamFlysystemSingleEncryptedZipArchive\WeakPasswordException;
+use SlamFlysystemEncryptedZipProxy\EncryptedZipProxyAdapter;
+use SlamFlysystemEncryptedZipProxy\UnableToWriteFileException;
+use SlamFlysystemEncryptedZipProxy\UnableToWriteToDirectoryException;
+use SlamFlysystemEncryptedZipProxy\UnsupportedOperationException;
+use SlamFlysystemEncryptedZipProxy\WeakPasswordException;
 use ZipArchive;
 
 /**
- * @covers \SlamFlysystemSingleEncryptedZipArchive\SingleEncryptedZipArchiveAdapter
+ * @covers \SlamFlysystemEncryptedZipProxy\EncryptedZipProxyAdapter
  *
  * @internal
  */
-final class SingleEncryptedZipArchiveAdapterTest extends FilesystemAdapterTestCase
+final class EncryptedZipProxyAdapterTest extends FilesystemAdapterTestCase
 {
-    private ?SingleEncryptedZipArchiveAdapter $customAdapter = null;
+    private ?EncryptedZipProxyAdapter $customAdapter = null;
     private string $zipPassword;
     private string $remoteMock;
     private string $localWorkdir;
@@ -48,11 +48,11 @@ final class SingleEncryptedZipArchiveAdapterTest extends FilesystemAdapterTestCa
         delete_directory($this->localWorkdir);
     }
 
-    public function adapter(): SingleEncryptedZipArchiveAdapter
+    public function adapter(): EncryptedZipProxyAdapter
     {
         if (null === $this->customAdapter) {
-            $this->zipPassword = SingleEncryptedZipArchiveAdapter::generateKey();
-            $this->customAdapter = new SingleEncryptedZipArchiveAdapter(
+            $this->zipPassword = EncryptedZipProxyAdapter::generateKey();
+            $this->customAdapter = new EncryptedZipProxyAdapter(
                 new LocalFilesystemAdapter($this->remoteMock),
                 $this->zipPassword,
                 $this->localWorkdir
@@ -67,7 +67,7 @@ final class SingleEncryptedZipArchiveAdapterTest extends FilesystemAdapterTestCa
      */
     public function accept_long_enough_password_only(): void
     {
-        new SingleEncryptedZipArchiveAdapter(
+        new EncryptedZipProxyAdapter(
             $this->createMock(FilesystemAdapter::class),
             '012345678901',
             $this->localWorkdir
@@ -75,7 +75,7 @@ final class SingleEncryptedZipArchiveAdapterTest extends FilesystemAdapterTestCa
 
         $this->expectException(WeakPasswordException::class);
 
-        new SingleEncryptedZipArchiveAdapter(
+        new EncryptedZipProxyAdapter(
             $this->createMock(FilesystemAdapter::class),
             '01234567890',
             $this->localWorkdir
@@ -91,9 +91,9 @@ final class SingleEncryptedZipArchiveAdapterTest extends FilesystemAdapterTestCa
 
         $this->expectException(UnableToWriteToDirectoryException::class);
 
-        new SingleEncryptedZipArchiveAdapter(
+        new EncryptedZipProxyAdapter(
             $this->createMock(FilesystemAdapter::class),
-            SingleEncryptedZipArchiveAdapter::generateKey(),
+            EncryptedZipProxyAdapter::generateKey(),
             $this->localWorkdir
         );
     }
@@ -104,8 +104,8 @@ final class SingleEncryptedZipArchiveAdapterTest extends FilesystemAdapterTestCa
     public function generated_keys_differ(): void
     {
         static::assertNotSame(
-            SingleEncryptedZipArchiveAdapter::generateKey(),
-            SingleEncryptedZipArchiveAdapter::generateKey()
+            EncryptedZipProxyAdapter::generateKey(),
+            EncryptedZipProxyAdapter::generateKey()
         );
     }
 
@@ -114,7 +114,7 @@ final class SingleEncryptedZipArchiveAdapterTest extends FilesystemAdapterTestCa
      */
     public function generate_long_enough_key(): void
     {
-        static::assertGreaterThan(43, \strlen(SingleEncryptedZipArchiveAdapter::generateKey()));
+        static::assertGreaterThan(43, \strlen(EncryptedZipProxyAdapter::generateKey()));
     }
 
     /**
@@ -207,9 +207,9 @@ final class SingleEncryptedZipArchiveAdapterTest extends FilesystemAdapterTestCa
     public function deleting_a_directory(): void
     {
         $remoteMock = $this->createMock(FilesystemAdapter::class);
-        $adapter = new SingleEncryptedZipArchiveAdapter(
+        $adapter = new EncryptedZipProxyAdapter(
             $remoteMock,
-            SingleEncryptedZipArchiveAdapter::generateKey(),
+            EncryptedZipProxyAdapter::generateKey(),
             $this->localWorkdir
         );
 
