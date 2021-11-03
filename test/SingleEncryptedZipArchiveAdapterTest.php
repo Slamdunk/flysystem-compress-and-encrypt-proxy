@@ -264,6 +264,19 @@ final class SingleEncryptedZipArchiveAdapterTest extends FilesystemAdapterTestCa
         $adapter->read('path.txt');
     }
 
+    /**
+     * @test
+     */
+    public function reading_multiple_files(): void
+    {
+        $adapter = $this->adapter();
+        $this->givenWeHaveAnExistingFile('path1.txt', '123');
+        $this->givenWeHaveAnExistingFile('path2.txt', '456');
+
+        static::assertSame('123', $adapter->read('path1.txt'));
+        static::assertSame('456', $adapter->read('path2.txt'));
+    }
+
     protected static function createFilesystemAdapter(): FilesystemAdapter
     {
         throw new RuntimeException('Only non-static adapter creation allowed');
