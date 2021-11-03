@@ -77,8 +77,6 @@ final class SingleEncryptedZipArchiveAdapter implements FilesystemAdapter
      */
     public function read(string $path): string
     {
-        $this->download($path);
-
         return stream_get_contents($this->readZipStream($path));
     }
 
@@ -87,8 +85,6 @@ final class SingleEncryptedZipArchiveAdapter implements FilesystemAdapter
      */
     public function readStream(string $path)
     {
-        $this->download($path);
-
         return $this->readZipStream($path);
     }
 
@@ -206,7 +202,10 @@ final class SingleEncryptedZipArchiveAdapter implements FilesystemAdapter
         return $localZipPath;
     }
 
-    private function download(string $path): void
+    /**
+     * @return resource
+     */
+    private function readZipStream(string $path)
     {
         $remotePath = $this->getRemotePath($path);
         $localZipPath = $this->getLocalZipPath($path);
@@ -220,14 +219,7 @@ final class SingleEncryptedZipArchiveAdapter implements FilesystemAdapter
 
             throw new UnableToWriteFileException("Unable to write to {$localZipPath}: {$reason}");
         }
-    }
 
-    /**
-     * @return resource
-     */
-    private function readZipStream(string $path)
-    {
-        $localZipPath = $this->getLocalZipPath($path);
         $this->zip->open($localZipPath, ZipArchive::RDONLY | ZipArchive::CHECKCONS);
         $this->zip->setPassword($this->password);
 
