@@ -9,6 +9,7 @@ use League\Flysystem\Config;
 use League\Flysystem\FileAttributes;
 use League\Flysystem\FilesystemAdapter;
 use League\Flysystem\Local\LocalFilesystemAdapter;
+use RuntimeException;
 use SlamFlysystemSingleEncryptedZipArchive\SingleEncryptedZipArchiveAdapter;
 use SlamFlysystemSingleEncryptedZipArchive\UnableToWriteToDirectoryException;
 use SlamFlysystemSingleEncryptedZipArchive\UnsupportedOperationException;
@@ -21,25 +22,42 @@ use ZipArchive;
  */
 final class SingleEncryptedZipArchiveAdapterTest extends FilesystemAdapterTestCase
 {
-    private const REMOTE_MOCK = __DIR__.'/assets/remote-mock';
-    private const LOCAL_WORKDIR = __DIR__.'/assets/local-workdir';
-
-    private static string $zipPassword;
+    private ?SingleEncryptedZipArchiveAdapter $customAdapter = null;
+    private string $zipPassword;
+    private string $remoteMock;
+    private string $localWorkdir;
 
     protected function setUp(): void
     {
+        $testToken = (int) getenv('TEST_TOKEN');
+        $this->remoteMock = __DIR__.'/assets/'.$testToken.'_remote-mock';
+        $this->localWorkdir = __DIR__.'/assets/'.$testToken.'_local-workdir';
         reset_function_mocks();
-        delete_directory(static::REMOTE_MOCK);
-        delete_directory(static::LOCAL_WORKDIR);
+        delete_directory($this->remoteMock);
+        delete_directory($this->localWorkdir);
 
-        mkdir(static::LOCAL_WORKDIR, 0700, true);
+        mkdir($this->localWorkdir, 0700, true);
     }
 
     protected function tearDown(): void
     {
         reset_function_mocks();
-        delete_directory(static::REMOTE_MOCK);
-        delete_directory(static::LOCAL_WORKDIR);
+        delete_directory($this->remoteMock);
+        delete_directory($this->localWorkdir);
+    }
+
+    public function adapter(): SingleEncryptedZipArchiveAdapter
+    {
+        if (null === $this->customAdapter) {
+            $this->zipPassword = SingleEncryptedZipArchiveAdapter::generateKey();
+            $this->customAdapter = new SingleEncryptedZipArchiveAdapter(
+                new LocalFilesystemAdapter($this->remoteMock),
+                $this->zipPassword,
+                $this->localWorkdir
+            );
+        }
+
+        return $this->customAdapter;
     }
 
     /**
@@ -47,14 +65,14 @@ final class SingleEncryptedZipArchiveAdapterTest extends FilesystemAdapterTestCa
      */
     public function local_directory_must_be_writable(): void
     {
-        chmod(static::LOCAL_WORKDIR, 0500);
+        chmod($this->localWorkdir, 0500);
 
         $this->expectException(UnableToWriteToDirectoryException::class);
 
         new SingleEncryptedZipArchiveAdapter(
             $this->createMock(FilesystemAdapter::class),
             SingleEncryptedZipArchiveAdapter::generateKey(),
-            self::LOCAL_WORKDIR
+            $this->localWorkdir
         );
     }
 
@@ -170,7 +188,7 @@ final class SingleEncryptedZipArchiveAdapterTest extends FilesystemAdapterTestCa
         $adapter = new SingleEncryptedZipArchiveAdapter(
             $remoteMock,
             SingleEncryptedZipArchiveAdapter::generateKey(),
-            self::LOCAL_WORKDIR
+            $this->localWorkdir
         );
 
         $path = uniqid('path_');
@@ -193,21 +211,17 @@ final class SingleEncryptedZipArchiveAdapterTest extends FilesystemAdapterTestCa
         $contents = uniqid('contents_');
         $adapter->write('/file.txt', $contents, new Config());
 
-        static::assertFileExists(static::REMOTE_MOCK.'/file.txt.zip');
-        static::assertFileDoesNotExist(static::REMOTE_MOCK.'/file.txt');
+        static::assertFileExists($this->remoteMock.'/file.txt.zip');
+        static::assertFileDoesNotExist($this->remoteMock.'/file.txt');
 
         $zip = new ZipArchive();
-        $zip->open(static::REMOTE_MOCK.'/file.txt.zip', ZipArchive::RDONLY | ZipArchive::CHECKCONS);
+        $zip->open($this->remoteMock.'/file.txt.zip', ZipArchive::RDONLY | ZipArchive::CHECKCONS);
 
         static::assertSame(1, $zip->numFiles);
     }
 
     protected static function createFilesystemAdapter(): FilesystemAdapter
     {
-        return new SingleEncryptedZipArchiveAdapter(
-            new LocalFilesystemAdapter(self::REMOTE_MOCK),
-            SingleEncryptedZipArchiveAdapter::generateKey(),
-            self::LOCAL_WORKDIR
-        );
+        throw new RuntimeException('Only non-static adapter creation allowed');
     }
 }
