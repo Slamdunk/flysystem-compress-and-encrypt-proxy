@@ -1,8 +1,8 @@
 {
-    "name": "slam/flysystem-single-encrypted-ziparchive",
+    "name": "slam/flysystem-encrypted-zip-proxy",
     "type": "library",
     "description": "FlySystem adapter to store content into single encrypted zips",
-    "homepage": "https://github.com/slamdunk/flysystem-single-encrypted-ziparchive",
+    "homepage": "https://github.com/slamdunk/flysystem-encrypted-zip-proxy",
     "license": "MIT",
     "authors": [
         {

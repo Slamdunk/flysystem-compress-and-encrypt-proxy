@@ -19,7 +19,7 @@
     </report>
   </coverage>
   <testsuites>
-    <testsuite name="Slam flysystem-single-encrypted-ziparchive">
+    <testsuite name="Slam flysystem-encrypted-zip-proxy">
       <directory>./test/</directory>
     </testsuite>
   </testsuites>

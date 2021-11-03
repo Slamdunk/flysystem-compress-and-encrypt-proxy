@@ -1,11 +1,11 @@
-# Slam / flysystem-single-encrypted-ziparchive
+# Slam / flysystem-encrypted-zip-proxy
 
-[![Latest Stable Version](https://img.shields.io/packagist/v/slam/flysystem-single-encrypted-ziparchive.svg)](https://packagist.org/packages/slam/flysystem-single-encrypted-ziparchive)
-[![Downloads](https://img.shields.io/packagist/dt/slam/flysystem-single-encrypted-ziparchive.svg)](https://packagist.org/packages/slam/flysystem-single-encrypted-ziparchive)
-[![Integrate](https://github.com/Slamdunk/flysystem-single-encrypted-ziparchive/workflows/Integrate/badge.svg?branch=master)](https://github.com/Slamdunk/flysystem-single-encrypted-ziparchive/actions)
-[![Code Coverage](https://codecov.io/gh/Slamdunk/flysystem-single-encrypted-ziparchive/coverage.svg?branch=master)](https://codecov.io/gh/Slamdunk/flysystem-single-encrypted-ziparchive?branch=master)
-[![Type Coverage](https://shepherd.dev/github/Slamdunk/flysystem-single-encrypted-ziparchive/coverage.svg)](https://shepherd.dev/github/Slamdunk/flysystem-single-encrypted-ziparchive)
-[![Infection MSI](https://badge.stryker-mutator.io/github.com/Slamdunk/flysystem-single-encrypted-ziparchive/master)](https://dashboard.stryker-mutator.io/reports/github.com/Slamdunk/flysystem-single-encrypted-ziparchive/master)
+[![Latest Stable Version](https://img.shields.io/packagist/v/slam/flysystem-encrypted-zip-proxy.svg)](https://packagist.org/packages/slam/flysystem-encrypted-zip-proxy)
+[![Downloads](https://img.shields.io/packagist/dt/slam/flysystem-encrypted-zip-proxy.svg)](https://packagist.org/packages/slam/flysystem-encrypted-zip-proxy)
+[![Integrate](https://github.com/Slamdunk/flysystem-encrypted-zip-proxy/workflows/Integrate/badge.svg?branch=master)](https://github.com/Slamdunk/flysystem-encrypted-zip-proxy/actions)
+[![Code Coverage](https://codecov.io/gh/Slamdunk/flysystem-encrypted-zip-proxy/coverage.svg?branch=master)](https://codecov.io/gh/Slamdunk/flysystem-encrypted-zip-proxy?branch=master)
+[![Type Coverage](https://shepherd.dev/github/Slamdunk/flysystem-encrypted-zip-proxy/coverage.svg)](https://shepherd.dev/github/Slamdunk/flysystem-encrypted-zip-proxy)
+[![Infection MSI](https://badge.stryker-mutator.io/github.com/Slamdunk/flysystem-encrypted-zip-proxy/master)](https://dashboard.stryker-mutator.io/reports/github.com/Slamdunk/flysystem-encrypted-zip-proxy/master)
 
 Zip and Encrypt files before saving them to the final Flysystem destination.
 
@@ -14,7 +14,7 @@ Zip and Encrypt files before saving them to the final Flysystem destination.
 To install with composer run the following command:
 
 ```console
-$ composer require slam/flysystem-single-encrypted-ziparchive
+$ composer require slam/flysystem-encrypted-zip-proxy
 ```
 
 ## Usage
