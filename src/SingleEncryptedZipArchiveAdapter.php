@@ -37,6 +37,13 @@ final class SingleEncryptedZipArchiveAdapter implements FilesystemAdapter
         return base64_encode(random_bytes(32));
     }
 
+    public function clearLocalWorkingDirectory(): void
+    {
+        foreach (glob($this->localWorkingDirectory.\DIRECTORY_SEPARATOR.'*.zip') as $file) {
+            unlink($file);
+        }
+    }
+
     /**
      * {@inheritDoc}
      */
