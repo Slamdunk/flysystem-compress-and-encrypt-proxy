@@ -277,6 +277,23 @@ final class SingleEncryptedZipArchiveAdapterTest extends FilesystemAdapterTestCa
         static::assertSame('456', $adapter->read('path2.txt'));
     }
 
+    /**
+     * @test
+     */
+    public function clear_local_working_directory(): void
+    {
+        $adapter = $this->adapter();
+
+        $contents = uniqid('contents_');
+        $adapter->write('/file.txt', $contents, new Config());
+
+        static::assertCount(1, glob($this->localWorkdir.'/*.zip'));
+
+        $adapter->clearLocalWorkingDirectory();
+
+        static::assertCount(0, glob($this->localWorkdir.'/*.zip'));
+    }
+
     protected static function createFilesystemAdapter(): FilesystemAdapter
     {
         throw new RuntimeException('Only non-static adapter creation allowed');
