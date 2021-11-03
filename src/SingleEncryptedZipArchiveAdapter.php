@@ -18,6 +18,13 @@ final class SingleEncryptedZipArchiveAdapter implements FilesystemAdapter
         private string $password,
         private string $localWorkingDirectory
     ) {
+        if (12 > strlen($password)) {
+            throw new WeakPasswordException(sprintf(
+                'Provided password is less then 12 chars. Consider using %s::generateKey() to get a strong one.',
+                __CLASS__
+            ));
+        }
+
         if (!is_dir($localWorkingDirectory) || !is_writable($localWorkingDirectory)) {
             throw new UnableToWriteToDirectoryException("{$localWorkingDirectory} is not writable");
         }
@@ -186,6 +193,7 @@ final class SingleEncryptedZipArchiveAdapter implements FilesystemAdapter
         $localZipPath = $this->getLocalZipPath($path);
         $this->zip->open($localZipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE);
         $this->zip->addFromString(basename($path), $contents);
+        $this->zip->setEncryptionName(basename($path), ZipArchive::EM_AES_256, $this->password);
         $this->zip->close();
 
         return $localZipPath;
@@ -205,6 +213,7 @@ final class SingleEncryptedZipArchiveAdapter implements FilesystemAdapter
     {
         $localZipPath = $this->getLocalZipPath($path);
         $this->zip->open($localZipPath, ZipArchive::RDONLY | ZipArchive::CHECKCONS);
+        $this->zip->setPassword($this->password);
 
         return $this->zip->getStream(basename($path));
     }
