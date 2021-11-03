@@ -64,13 +64,19 @@ final class SingleEncryptedZipArchiveAdapterTest extends FilesystemAdapterTestCa
     /**
      * @test
      */
-    public function accept_non_trivial_password_only(): void
+    public function accept_long_enough_password_only(): void
     {
+        new SingleEncryptedZipArchiveAdapter(
+            $this->createMock(FilesystemAdapter::class),
+            '012345678901',
+            $this->localWorkdir
+        );
+
         $this->expectException(WeakPasswordException::class);
 
         new SingleEncryptedZipArchiveAdapter(
             $this->createMock(FilesystemAdapter::class),
-            'foo',
+            '01234567890',
             $this->localWorkdir
         );
     }
