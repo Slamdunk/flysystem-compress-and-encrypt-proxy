@@ -55,16 +55,17 @@ https://www.winzip.com/en/support/aes-encryption/
 
 It has been choosen because it best fits all the following goals:
 
-1. Strength: AES-256-CTR, PBKDF2-HMAC-SHA1 and HMAC-SHA1-80 algorithms are still
+1. Strength: `AES-256-CTR`, `PBKDF2-HMAC-SHA1` and `HMAC-SHA1-80` algorithms for
+   respectively encryption, key derivation and authentication are old but still
    good enough.
 1. Ease of use: PHP's ZipArchive provides both compression and encryption with
    a simple and user-friendly API
-1. Availability: ZIP-AES is supported by almost any zip-related tool, so if you
+1. Availability: ZIP-AES is supported by almost every zip-related tool, so if you
    get stuck and have to recover the plain files outside PHP, you have plenty
    of options to do it easily and quickly
 
 ## Difference with FlySystem ZipArchive
 
 [`flysystem-ziparchive`](https://github.com/thephpleague/flysystem-ziparchive/tree/2.x)
-store everything into a single big ZIP file. This adapter instead creates
+stores everything into a single big ZIP file. This adapter instead creates
 a Zip for every file you write/upload to the actual adapter.
