@@ -18,7 +18,7 @@ final class SingleEncryptedZipArchiveAdapter implements FilesystemAdapter
         private string $password,
         private string $localWorkingDirectory
     ) {
-        if (12 > strlen($password)) {
+        if (12 > \strlen($password)) {
             throw new WeakPasswordException(sprintf(
                 'Provided password is less then 12 chars. Consider using %s::generateKey() to get a strong one.',
                 __CLASS__
