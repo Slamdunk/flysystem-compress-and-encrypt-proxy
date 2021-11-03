@@ -203,7 +203,16 @@ final class SingleEncryptedZipArchiveAdapter implements FilesystemAdapter
     {
         $remotePath = $this->getRemotePath($path);
         $localZipPath = $this->getLocalZipPath($path);
-        file_put_contents($localZipPath, $this->remoteAdapter->read($remotePath));
+        $contents = $this->remoteAdapter->readStream($remotePath);
+
+        error_clear_last();
+        $stream = @fopen($localZipPath, 'w+');
+
+        if (!(false !== $stream && false !== stream_copy_to_stream($contents, $stream) && fclose($stream))) {
+            $reason = error_get_last()['message'] ?? '';
+
+            throw new UnableToWriteFileException("Unable to write to {$localZipPath}: {$reason}");
+        }
     }
 
     /**

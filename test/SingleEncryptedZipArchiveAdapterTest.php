@@ -11,6 +11,7 @@ use League\Flysystem\FilesystemAdapter;
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use RuntimeException;
 use SlamFlysystemSingleEncryptedZipArchive\SingleEncryptedZipArchiveAdapter;
+use SlamFlysystemSingleEncryptedZipArchive\UnableToWriteFileException;
 use SlamFlysystemSingleEncryptedZipArchive\UnableToWriteToDirectoryException;
 use SlamFlysystemSingleEncryptedZipArchive\UnsupportedOperationException;
 use SlamFlysystemSingleEncryptedZipArchive\WeakPasswordException;
@@ -244,6 +245,23 @@ final class SingleEncryptedZipArchiveAdapterTest extends FilesystemAdapterTestCa
         static::assertFalse($zip->getFromIndex(0));
         $zip->setPassword($this->zipPassword);
         static::assertSame($contents, $zip->getFromIndex(0));
+    }
+
+    /**
+     * @test
+     */
+    public function failing_to_download_a_file_using_a_stream(): void
+    {
+        $adapter = $this->adapter();
+        $this->givenWeHaveAnExistingFile('path.txt', 'contents');
+        foreach (glob($this->localWorkdir.'/*zip') as $file) {
+            chmod($file, 0400);
+        }
+
+        $this->expectException(UnableToWriteFileException::class);
+        $this->expectExceptionMessageMatches('/Permission denied/');
+
+        $adapter->read('path.txt');
     }
 
     protected static function createFilesystemAdapter(): FilesystemAdapter
