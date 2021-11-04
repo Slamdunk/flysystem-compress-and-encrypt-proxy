@@ -11,11 +11,8 @@ use League\Flysystem\FilesystemAdapter;
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use RuntimeException;
 use SlamFlysystemEncryptedZipProxy\EncryptedZipProxyAdapter;
-use SlamFlysystemEncryptedZipProxy\UnableToWriteFileException;
-use SlamFlysystemEncryptedZipProxy\UnableToWriteToDirectoryException;
 use SlamFlysystemEncryptedZipProxy\UnsupportedOperationException;
 use SlamFlysystemEncryptedZipProxy\WeakPasswordException;
-use ZipArchive;
 
 /**
  * @covers \SlamFlysystemEncryptedZipProxy\EncryptedZipProxyAdapter
@@ -27,25 +24,19 @@ final class EncryptedZipProxyAdapterTest extends FilesystemAdapterTestCase
     private ?EncryptedZipProxyAdapter $customAdapter = null;
     private string $zipPassword;
     private string $remoteMock;
-    private string $localWorkdir;
 
     protected function setUp(): void
     {
         $testToken = (int) getenv('TEST_TOKEN');
         $this->remoteMock = __DIR__.'/assets/'.$testToken.'_remote-mock';
-        $this->localWorkdir = __DIR__.'/assets/'.$testToken.'_local-workdir';
         reset_function_mocks();
         delete_directory($this->remoteMock);
-        delete_directory($this->localWorkdir);
-
-        mkdir($this->localWorkdir, 0700, true);
     }
 
     protected function tearDown(): void
     {
         reset_function_mocks();
         delete_directory($this->remoteMock);
-        delete_directory($this->localWorkdir);
     }
 
     public function adapter(): EncryptedZipProxyAdapter
@@ -54,8 +45,7 @@ final class EncryptedZipProxyAdapterTest extends FilesystemAdapterTestCase
             $this->zipPassword = EncryptedZipProxyAdapter::generateKey();
             $this->customAdapter = new EncryptedZipProxyAdapter(
                 new LocalFilesystemAdapter($this->remoteMock),
-                $this->zipPassword,
-                $this->localWorkdir
+                $this->zipPassword
             );
         }
 
@@ -67,34 +57,11 @@ final class EncryptedZipProxyAdapterTest extends FilesystemAdapterTestCase
      */
     public function accept_long_enough_password_only(): void
     {
-        new EncryptedZipProxyAdapter(
-            $this->createMock(FilesystemAdapter::class),
-            '012345678901',
-            $this->localWorkdir
-        );
-
         $this->expectException(WeakPasswordException::class);
 
         new EncryptedZipProxyAdapter(
             $this->createMock(FilesystemAdapter::class),
-            '01234567890',
-            $this->localWorkdir
-        );
-    }
-
-    /**
-     * @test
-     */
-    public function local_directory_must_be_writable(): void
-    {
-        chmod($this->localWorkdir, 0500);
-
-        $this->expectException(UnableToWriteToDirectoryException::class);
-
-        new EncryptedZipProxyAdapter(
-            $this->createMock(FilesystemAdapter::class),
-            EncryptedZipProxyAdapter::generateKey(),
-            $this->localWorkdir
+            base64_encode(random_bytes(8))
         );
     }
 
@@ -209,8 +176,7 @@ final class EncryptedZipProxyAdapterTest extends FilesystemAdapterTestCase
         $remoteMock = $this->createMock(FilesystemAdapter::class);
         $adapter = new EncryptedZipProxyAdapter(
             $remoteMock,
-            EncryptedZipProxyAdapter::generateKey(),
-            $this->localWorkdir
+            EncryptedZipProxyAdapter::generateKey()
         );
 
         $path = uniqid('path_');
@@ -233,35 +199,11 @@ final class EncryptedZipProxyAdapterTest extends FilesystemAdapterTestCase
         $contents = uniqid('contents_');
         $adapter->write('/file.txt', $contents, new Config());
 
-        static::assertFileExists($this->remoteMock.'/file.txt.zip');
         static::assertFileDoesNotExist($this->remoteMock.'/file.txt');
-
-        $zip = new ZipArchive();
-        $zip->open($this->remoteMock.'/file.txt.zip', ZipArchive::RDONLY | ZipArchive::CHECKCONS);
-
-        static::assertSame(1, $zip->numFiles);
-        static::assertSame('file.txt', $zip->getNameIndex(0));
-
-        static::assertFalse($zip->getFromIndex(0));
-        $zip->setPassword($this->zipPassword);
-        static::assertSame($contents, $zip->getFromIndex(0));
-    }
-
-    /**
-     * @test
-     */
-    public function failing_to_download_a_file_using_a_stream(): void
-    {
-        $adapter = $this->adapter();
-        $this->givenWeHaveAnExistingFile('path.txt', 'contents');
-        foreach (glob($this->localWorkdir.'/*zip') as $file) {
-            chmod($file, 0400);
-        }
-
-        $this->expectException(UnableToWriteFileException::class);
-        $this->expectExceptionMessageMatches('/Permission denied/');
-
-        $adapter->read('path.txt');
+        static::assertStringNotEqualsFile(
+            $this->remoteMock.'/file.txt'.EncryptedZipProxyAdapter::REMOTE_FILE_EXTENSION,
+            $contents
+        );
     }
 
     /**
@@ -275,23 +217,6 @@ final class EncryptedZipProxyAdapterTest extends FilesystemAdapterTestCase
 
         static::assertSame('123', $adapter->read('path1.txt'));
         static::assertSame('456', $adapter->read('path2.txt'));
-    }
-
-    /**
-     * @test
-     */
-    public function clear_local_working_directory(): void
-    {
-        $adapter = $this->adapter();
-
-        $contents = uniqid('contents_');
-        $adapter->write('/file.txt', $contents, new Config());
-
-        static::assertCount(1, glob($this->localWorkdir.'/*.zip'));
-
-        $adapter->__destruct();
-
-        static::assertCount(0, glob($this->localWorkdir.'/*.zip'));
     }
 
     protected static function createFilesystemAdapter(): FilesystemAdapter

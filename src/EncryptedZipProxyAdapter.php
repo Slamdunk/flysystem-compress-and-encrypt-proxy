@@ -7,41 +7,37 @@ namespace SlamFlysystemEncryptedZipProxy;
 use League\Flysystem\Config;
 use League\Flysystem\FileAttributes;
 use League\Flysystem\FilesystemAdapter;
-use ZipArchive;
 
 final class EncryptedZipProxyAdapter implements FilesystemAdapter
 {
-    private ZipArchive $zip;
+    public const REMOTE_FILE_EXTENSION = '.gz.encrypted';
+    private FilesystemAdapter $remoteAdapter;
+    private string $key;
 
     public function __construct(
-        private FilesystemAdapter $remoteAdapter,
-        private string $password,
-        private string $localWorkingDirectory
+        FilesystemAdapter $remoteAdapter,
+        string $key
     ) {
-        if (12 > \strlen($password)) {
+        $key = sodium_base642bin($key, SODIUM_BASE64_VARIANT_ORIGINAL);
+        if (SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_KEYBYTES !== mb_strlen($key, '8bit')) {
             throw new WeakPasswordException(sprintf(
-                'Provided password is less then 12 chars. Consider using %s::generateKey() to get a strong one.',
+                'Provided key is not long exactly %s bits. Consider using %s::generateKey() to get a strong one.',
+                8 * SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_KEYBYTES,
                 __CLASS__
             ));
         }
 
-        if (!is_dir($localWorkingDirectory) || !is_writable($localWorkingDirectory)) {
-            throw new UnableToWriteToDirectoryException("{$localWorkingDirectory} is not writable");
-        }
-
-        $this->zip = new ZipArchive();
-    }
-
-    public function __destruct()
-    {
-        foreach (glob($this->localWorkingDirectory.\DIRECTORY_SEPARATOR.'*.zip') as $file) {
-            @unlink($file);
-        }
+        EncryptorStreamFilter::register();
+        $this->remoteAdapter = $remoteAdapter;
+        $this->key = $key;
     }
 
     public static function generateKey(): string
     {
-        return base64_encode(random_bytes(32));
+        return sodium_bin2base64(
+            sodium_crypto_secretstream_xchacha20poly1305_keygen(),
+            SODIUM_BASE64_VARIANT_ORIGINAL
+        );
     }
 
     /**
@@ -57,9 +53,11 @@ final class EncryptedZipProxyAdapter implements FilesystemAdapter
      */
     public function write(string $path, string $contents, Config $config): void
     {
-        $localZipPath = $this->writeToLocalZip($path, $contents);
+        $stream = fopen('php://temp', 'w+');
+        fwrite($stream, $contents);
+        rewind($stream);
 
-        $this->remoteAdapter->write($this->getRemotePath($path), file_get_contents($localZipPath), $config);
+        $this->writeStream($path, $stream, $config);
     }
 
     /**
@@ -67,9 +65,10 @@ final class EncryptedZipProxyAdapter implements FilesystemAdapter
      */
     public function writeStream(string $path, $contents, Config $config): void
     {
-        $localZipPath = $this->writeToLocalZip($path, stream_get_contents($contents));
+        stream_filter_append($contents, 'zlib.deflate');
+        EncryptorStreamFilter::appendEncryption($contents, $this->key);
 
-        $this->remoteAdapter->writeStream($this->getRemotePath($path), fopen($localZipPath, 'r'), $config);
+        $this->remoteAdapter->writeStream($this->getRemotePath($path), $contents, $config);
     }
 
     /**
@@ -77,7 +76,7 @@ final class EncryptedZipProxyAdapter implements FilesystemAdapter
      */
     public function read(string $path): string
     {
-        return stream_get_contents($this->readZipStream($path));
+        return stream_get_contents($this->readStream($path));
     }
 
     /**
@@ -85,7 +84,12 @@ final class EncryptedZipProxyAdapter implements FilesystemAdapter
      */
     public function readStream(string $path)
     {
-        return $this->readZipStream($path);
+        $contents = $this->remoteAdapter->readStream($this->getRemotePath($path));
+
+        EncryptorStreamFilter::appendDecryption($contents, $this->key);
+        stream_filter_append($contents, 'zlib.inflate');
+
+        return $contents;
     }
 
     /**
@@ -162,7 +166,7 @@ final class EncryptedZipProxyAdapter implements FilesystemAdapter
         foreach ($remoteList as $content) {
             if ($content instanceof FileAttributes) {
                 $content = new FileAttributes(
-                    substr($content->path(), 0, -4),
+                    substr($content->path(), 0, -\strlen(self::REMOTE_FILE_EXTENSION)),
                     $content->fileSize(),
                     $content->visibility(),
                     $content->lastModified(),
@@ -191,60 +195,8 @@ final class EncryptedZipProxyAdapter implements FilesystemAdapter
         throw new UnsupportedOperationException(__METHOD__.' operation is not supported');
     }
 
-    private function writeToLocalZip(string $path, string $contents): string
-    {
-        $localZipPath = $this->getLocalZipPath($path);
-        $this->zip->open($localZipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE);
-        $this->zip->addFromString(basename($path), $contents);
-        $this->zip->setEncryptionName(basename($path), ZipArchive::EM_AES_256, $this->password);
-        $this->zip->close();
-
-        return $localZipPath;
-    }
-
-    /**
-     * @return resource
-     */
-    private function readZipStream(string $path)
-    {
-        $remotePath = $this->getRemotePath($path);
-        $localZipPath = $this->getLocalZipPath($path);
-        $contents = $this->remoteAdapter->readStream($remotePath);
-
-        error_clear_last();
-        $stream = @fopen($localZipPath, 'w+');
-
-        if (!(false !== $stream && false !== stream_copy_to_stream($contents, $stream) && fclose($stream))) {
-            $reason = error_get_last()['message'] ?? '';
-
-            throw new UnableToWriteFileException("Unable to write to {$localZipPath}: {$reason}");
-        }
-
-        $this->zip->open($localZipPath, ZipArchive::RDONLY | ZipArchive::CHECKCONS);
-        $this->zip->setPassword($this->password);
-
-        return $this->zip->getStream(basename($path));
-    }
-
     private function getRemotePath(string $path): string
     {
-        return $path.'.zip';
-    }
-
-    private function getLocalZipPath(string $path): string
-    {
-        $pathFingerprint = sprintf(
-            '%s#%s',
-            \get_class($this->remoteAdapter),
-            $path
-        );
-
-        return sprintf(
-            '%s%s%s_%s.zip',
-            $this->localWorkingDirectory,
-            \DIRECTORY_SEPARATOR,
-            sha1($pathFingerprint),
-            basename($path)
-        );
+        return $path.self::REMOTE_FILE_EXTENSION;
     }
 }
