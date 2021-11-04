@@ -145,7 +145,9 @@ final class EncryptorStreamFilter extends php_user_filter
         $data = substr($this->buffer, 0, self::ENCRYPT_READ_BYTES);
         $this->buffer = substr($this->buffer, self::ENCRYPT_READ_BYTES);
 
+        \assert(null !== $lastBucket);
         $lastBucket->data = $header.sodium_crypto_secretstream_xchacha20poly1305_push($this->state, $data);
+        \assert(\is_string($lastBucket->data));
         $lastBucket->datalen = \strlen($lastBucket->data);
 
         $consumed += \strlen($data);
@@ -181,12 +183,15 @@ final class EncryptorStreamFilter extends php_user_filter
             $output = true;
         }
 
-        if (!$output) {
+        if (!$output && !$closing) {
             return PSFS_FEED_ME;
         }
 
         $header = '';
         if (null === $this->state) {
+            if ('' === $this->buffer) {
+                return PSFS_FEED_ME;
+            }
             $header = substr($this->buffer, 0, 24);
             $this->buffer = substr($this->buffer, 24);
 
@@ -204,6 +209,7 @@ final class EncryptorStreamFilter extends php_user_filter
 
         $consumedData = \strlen($header) + \strlen($data);
         [$newBucketData] = sodium_crypto_secretstream_xchacha20poly1305_pull($this->state, $data);
+        \assert(\is_string($newBucketData));
 
         $newBucket = stream_bucket_new(
             $this->stream,
@@ -214,6 +220,7 @@ final class EncryptorStreamFilter extends php_user_filter
 
         if ($closing && '' !== $this->buffer) {
             [$newBucketData] = sodium_crypto_secretstream_xchacha20poly1305_pull($this->state, $this->buffer);
+            \assert(\is_string($newBucketData));
 
             $newBucket = stream_bucket_new(
                 $this->stream,

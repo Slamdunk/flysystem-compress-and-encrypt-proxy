@@ -13,6 +13,14 @@
     },
     "mutators": {
         "@default": true,
+        "global-ignoreSourceCodeByRegex": [
+            "assert\\(.+\\);"
+        ],
+        "FunctionCallRemoval": {
+            "ignoreSourceCodeByRegex": [
+                "sodium_memzero\\(.+\\);"
+            ]
+        },
         "BitwiseOr": {
             "ignoreSourceCodeByRegex": [
                 ".+ZipArchive::RDONLY . ZipArchive::CHECKCONS.+"
