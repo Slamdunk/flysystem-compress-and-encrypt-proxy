@@ -11,6 +11,15 @@
       <code>$key</code>
       <code>$mode</code>
     </MissingConstructor>
+    <MixedArgument occurrences="3">
+      <code>$this-&gt;stream</code>
+      <code>$this-&gt;stream</code>
+      <code>$this-&gt;stream</code>
+    </MixedArgument>
+    <UndefinedThisPropertyFetch occurrences="2">
+      <code>$this-&gt;stream</code>
+      <code>$this-&gt;stream</code>
+    </UndefinedThisPropertyFetch>
     <UnusedFunctionCall occurrences="3">
       <code>stream_filter_append</code>
       <code>stream_filter_append</code>
@@ -31,5 +40,13 @@
       <code>EncryptorStreamFilterTest</code>
       <code>EncryptorStreamFilterTest</code>
     </PropertyNotSetInConstructor>
+    <UnusedFunctionCall occurrences="6">
+      <code>stream_filter_append</code>
+      <code>stream_filter_append</code>
+      <code>stream_filter_append</code>
+      <code>stream_filter_append</code>
+      <code>stream_filter_append</code>
+      <code>stream_filter_append</code>
+    </UnusedFunctionCall>
   </file>
 </files>

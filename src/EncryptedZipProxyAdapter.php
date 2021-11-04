@@ -19,7 +19,7 @@ final class EncryptedZipProxyAdapter implements FilesystemAdapter
         string $key
     ) {
         $key = sodium_base642bin($key, SODIUM_BASE64_VARIANT_ORIGINAL);
-        if (SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_KEYBYTES !== mb_strlen($key, '8bit')) {
+        if (SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_KEYBYTES !== \strlen($key)) {
             throw new WeakPasswordException(sprintf(
                 'Provided key is not long exactly %s bits. Consider using %s::generateKey() to get a strong one.',
                 8 * SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_KEYBYTES,
