@@ -11,7 +11,6 @@ use League\Flysystem\FilesystemAdapter;
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use RuntimeException;
 use SlamFlysystemEncryptedZipProxy\EncryptedZipProxyAdapter;
-use SlamFlysystemEncryptedZipProxy\UnsupportedOperationException;
 use SlamFlysystemEncryptedZipProxy\WeakPasswordException;
 
 /**
@@ -23,7 +22,6 @@ use SlamFlysystemEncryptedZipProxy\WeakPasswordException;
 final class EncryptedZipProxyAdapterTest extends FilesystemAdapterTestCase
 {
     private ?EncryptedZipProxyAdapter $customAdapter = null;
-    private string $zipPassword;
     private string $remoteMock;
 
     protected function setUp(): void
@@ -43,10 +41,9 @@ final class EncryptedZipProxyAdapterTest extends FilesystemAdapterTestCase
     public function adapter(): EncryptedZipProxyAdapter
     {
         if (null === $this->customAdapter) {
-            $this->zipPassword = EncryptedZipProxyAdapter::generateKey();
             $this->customAdapter = new EncryptedZipProxyAdapter(
                 new LocalFilesystemAdapter($this->remoteMock),
-                $this->zipPassword
+                EncryptedZipProxyAdapter::generateKey()
             );
         }
 
@@ -83,61 +80,6 @@ final class EncryptedZipProxyAdapterTest extends FilesystemAdapterTestCase
     public function generate_long_enough_key(): void
     {
         static::assertGreaterThan(43, \strlen(EncryptedZipProxyAdapter::generateKey()));
-    }
-
-    /**
-     * @test
-     */
-    public function copying_a_file(): void
-    {
-        $this->expectException(UnsupportedOperationException::class);
-        $this->expectExceptionMessageMatches('/copy operation is not supported/');
-
-        parent::copying_a_file();
-    }
-
-    /**
-     * @test
-     */
-    public function copying_a_file_again(): void
-    {
-        $this->expectException(UnsupportedOperationException::class);
-        $this->expectExceptionMessageMatches('/copy operation is not supported/');
-
-        parent::copying_a_file_again();
-    }
-
-    /**
-     * @test
-     */
-    public function copying_a_file_with_collision(): void
-    {
-        $this->expectException(UnsupportedOperationException::class);
-        $this->expectExceptionMessageMatches('/copy operation is not supported/');
-
-        parent::copying_a_file_with_collision();
-    }
-
-    /**
-     * @test
-     */
-    public function moving_a_file(): void
-    {
-        $this->expectException(UnsupportedOperationException::class);
-        $this->expectExceptionMessageMatches('/move operation is not supported/');
-
-        parent::moving_a_file();
-    }
-
-    /**
-     * @test
-     */
-    public function moving_a_file_that_does_not_exist(): void
-    {
-        $this->expectException(UnsupportedOperationException::class);
-        $this->expectExceptionMessageMatches('/move operation is not supported/');
-
-        $this->adapter()->move('source.txt', 'destination.txt', new Config());
     }
 
     /**

@@ -26,20 +26,22 @@ final class EncryptorStreamFilterTest extends TestCase
 
         $cipherStream = $this->streamFromContents($originalPlain);
         if (null !== $additionalOutStream) {
-            stream_filter_append($cipherStream, $additionalOutStream);
+            static::assertNotFalse(stream_filter_append($cipherStream, $additionalOutStream));
         }
         EncryptorStreamFilter::appendEncryption($cipherStream, $key);
 
         $cipher = stream_get_contents($cipherStream);
+        fclose($cipherStream);
         static::assertNotSame($originalPlain, $cipher);
 
         $plainStream = $this->streamFromContents($cipher);
         EncryptorStreamFilter::appendDecryption($plainStream, $key);
         if (null !== $additionalInStream) {
-            stream_filter_append($plainStream, $additionalInStream);
+            static::assertNotFalse(stream_filter_append($plainStream, $additionalInStream));
         }
 
         $plain = stream_get_contents($plainStream);
+        fclose($plainStream);
         static::assertSame(
             str_split(base64_encode($originalPlain), 1024),
             str_split(base64_encode($plain), 1024)
@@ -51,10 +53,12 @@ final class EncryptorStreamFilterTest extends TestCase
         return [
             'alone-short' => ['foo', null, null],
             'alone-long' => [str_repeat('foo', 10000), null, null],
-            'alone-random' => [base64_encode(random_bytes(10000)), null, null],
+            'alone-random-short' => [base64_encode(random_bytes(1000)), null, null],
+            'alone-random-long' => [base64_encode(random_bytes(100000)), null, null],
             'zlib-short' => ['foo', 'zlib.deflate', 'zlib.inflate'],
-            'zlib-long' => [str_repeat('foo', 10000), 'zlib.deflate', 'zlib.inflate'],
-            'zlib-random' => [base64_encode(random_bytes(10000)), 'zlib.deflate', 'zlib.inflate'],
+            'zlib-long' => [str_repeat('foo', 1000000), 'zlib.deflate', 'zlib.inflate'],
+            'zlib-random-short' => [base64_encode(random_bytes(1000)), 'zlib.deflate', 'zlib.inflate'],
+            'zlib-random-long' => [base64_encode(random_bytes(100000)), 'zlib.deflate', 'zlib.inflate'],
         ];
     }
 
@@ -67,26 +71,32 @@ final class EncryptorStreamFilterTest extends TestCase
         EncryptorStreamFilter::register();
 
         $cipherStream1 = $this->streamFromContents('123');
-        stream_filter_append($cipherStream1, 'zlib.deflate');
+        static::assertNotFalse(stream_filter_append($cipherStream1, 'zlib.deflate'));
         EncryptorStreamFilter::appendEncryption($cipherStream1, $key);
 
         $cipherStream2 = $this->streamFromContents('456');
-        stream_filter_append($cipherStream2, 'zlib.deflate');
+        static::assertNotFalse(stream_filter_append($cipherStream2, 'zlib.deflate'));
         EncryptorStreamFilter::appendEncryption($cipherStream2, $key);
 
         $cipher1 = stream_get_contents($cipherStream1);
         $cipher2 = stream_get_contents($cipherStream2);
 
+        fclose($cipherStream1);
+        fclose($cipherStream2);
+
         $plainStream1 = $this->streamFromContents($cipher1);
         EncryptorStreamFilter::appendDecryption($plainStream1, $key);
-        stream_filter_append($plainStream1, 'zlib.inflate');
+        static::assertNotFalse(stream_filter_append($plainStream1, 'zlib.inflate'));
 
         $plainStream2 = $this->streamFromContents($cipher2);
         EncryptorStreamFilter::appendDecryption($plainStream2, $key);
-        stream_filter_append($plainStream2, 'zlib.inflate');
+        static::assertNotFalse(stream_filter_append($plainStream2, 'zlib.inflate'));
 
         $plain1 = stream_get_contents($plainStream1);
         $plain2 = stream_get_contents($plainStream2);
+
+        fclose($plainStream1);
+        fclose($plainStream2);
 
         static::assertSame('123', $plain1);
         static::assertSame('456', $plain2);

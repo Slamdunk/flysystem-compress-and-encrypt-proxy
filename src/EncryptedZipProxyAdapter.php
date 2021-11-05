@@ -21,8 +21,8 @@ final class EncryptedZipProxyAdapter implements FilesystemAdapter
         $key = sodium_base642bin($key, SODIUM_BASE64_VARIANT_ORIGINAL);
         if (SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_KEYBYTES !== \strlen($key)) {
             throw new WeakPasswordException(sprintf(
-                'Provided key is not long exactly %s bits. Consider using %s::generateKey() to get a strong one.',
-                8 * SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_KEYBYTES,
+                'Provided key is not long exactly %s bytes. Consider using %s::generateKey() to get a strong one.',
+                SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_KEYBYTES,
                 __CLASS__
             ));
         }
@@ -65,7 +65,8 @@ final class EncryptedZipProxyAdapter implements FilesystemAdapter
      */
     public function writeStream(string $path, $contents, Config $config): void
     {
-        stream_filter_append($contents, 'zlib.deflate');
+        $zlibFilter = stream_filter_append($contents, 'zlib.deflate');
+        \assert(false !== $zlibFilter);
         EncryptorStreamFilter::appendEncryption($contents, $this->key);
 
         $this->remoteAdapter->writeStream($this->getRemotePath($path), $contents, $config);
@@ -87,7 +88,8 @@ final class EncryptedZipProxyAdapter implements FilesystemAdapter
         $contents = $this->remoteAdapter->readStream($this->getRemotePath($path));
 
         EncryptorStreamFilter::appendDecryption($contents, $this->key);
-        stream_filter_append($contents, 'zlib.inflate');
+        $zlibFilter = stream_filter_append($contents, 'zlib.inflate');
+        \assert(false !== $zlibFilter);
 
         return $contents;
     }
@@ -184,7 +186,11 @@ final class EncryptedZipProxyAdapter implements FilesystemAdapter
      */
     public function move(string $source, string $destination, Config $config): void
     {
-        throw new UnsupportedOperationException(__METHOD__.' operation is not supported');
+        $this->remoteAdapter->move(
+            $this->getRemotePath($source),
+            $this->getRemotePath($destination),
+            $config
+        );
     }
 
     /**
@@ -192,7 +198,11 @@ final class EncryptedZipProxyAdapter implements FilesystemAdapter
      */
     public function copy(string $source, string $destination, Config $config): void
     {
-        throw new UnsupportedOperationException(__METHOD__.' operation is not supported');
+        $this->remoteAdapter->copy(
+            $this->getRemotePath($source),
+            $this->getRemotePath($destination),
+            $config
+        );
     }
 
     private function getRemotePath(string $path): string

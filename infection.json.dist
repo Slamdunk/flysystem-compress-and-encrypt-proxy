@@ -14,7 +14,8 @@
     "mutators": {
         "@default": true,
         "global-ignoreSourceCodeByRegex": [
-            "assert\\(.+\\);"
+            "\\\\assert\\(.+\\);",
+            "\\$consumed .= .+;"
         ],
         "FunctionCallRemoval": {
             "ignoreSourceCodeByRegex": [
