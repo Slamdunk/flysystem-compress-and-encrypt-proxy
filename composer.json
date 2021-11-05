@@ -1,7 +1,7 @@
 {
     "name": "slam/flysystem-compress-and-encrypt-proxy",
     "type": "library",
-    "description": "FlySystem adapter to store content into single encrypted zips",
+    "description": "FlySystem adapter to compress and encrypt content before sending it to the real adapter",
     "homepage": "https://github.com/slamdunk/flysystem-compress-and-encrypt-proxy",
     "license": "MIT",
     "authors": [
