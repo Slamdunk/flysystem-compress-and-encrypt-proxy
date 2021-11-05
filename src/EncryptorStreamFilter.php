@@ -123,6 +123,7 @@ final class EncryptorStreamFilter extends php_user_filter
         // if (self::ENCRYPT_READ_BYTES > \strlen($this->buffer) && !$closing) {
         //     return PSFS_FEED_ME;
         // }
+        \assert(!(self::ENCRYPT_READ_BYTES > \strlen($this->buffer) && !$closing));
 
         $header = '';
         if (null === $this->state) {
