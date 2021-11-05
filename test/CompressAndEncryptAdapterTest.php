@@ -112,6 +112,8 @@ final class CompressAndEncryptAdapterTest extends FilesystemAdapterTestCase
     }
 
     /**
+     * Delete this tests once https://github.com/thephpleague/flysystem/pull/1375 is released.
+     *
      * @test
      */
     public function writing_a_file_with_a_stream(): void
@@ -119,6 +121,7 @@ final class CompressAndEncryptAdapterTest extends FilesystemAdapterTestCase
         $this->runScenario(function () {
             $adapter = $this->adapter();
             $writeStream = stream_with_contents('contents');
+            self::assertIsResource($writeStream);
 
             $adapter->writeStream('path.txt', $writeStream, new Config());
             fclose($writeStream);
@@ -129,6 +132,8 @@ final class CompressAndEncryptAdapterTest extends FilesystemAdapterTestCase
     }
 
     /**
+     * Delete this tests once https://github.com/thephpleague/flysystem/pull/1375 is released.
+     *
      * @test
      */
     public function writing_a_file_with_an_empty_stream(): void
@@ -136,6 +141,7 @@ final class CompressAndEncryptAdapterTest extends FilesystemAdapterTestCase
         $this->runScenario(function () {
             $adapter = $this->adapter();
             $writeStream = stream_with_contents('');
+            self::assertIsResource($writeStream);
 
             $adapter->writeStream('path.txt', $writeStream, new Config());
             fclose($writeStream);

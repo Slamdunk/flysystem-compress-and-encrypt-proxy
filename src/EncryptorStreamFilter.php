@@ -73,7 +73,7 @@ final class EncryptorStreamFilter extends php_user_filter
     {
         return match ($this->mode) {
             self::MODE_ENCRYPT => $this->encryptFilter($in, $out, $consumed, $closing),
-        self::MODE_DECRYPT => $this->decryptFilter($in, $out, $consumed, $closing),
+            self::MODE_DECRYPT => $this->decryptFilter($in, $out, $consumed, $closing),
         };
     }
 
@@ -131,33 +131,23 @@ final class EncryptorStreamFilter extends php_user_filter
             \assert(\is_string($header));
         }
 
-        $data = substr($this->buffer, 0, self::ENCRYPT_READ_BYTES);
-        $this->buffer = substr($this->buffer, self::ENCRYPT_READ_BYTES);
+        while ('' !== $this->buffer) {
+            $data = substr($this->buffer, 0, self::ENCRYPT_READ_BYTES);
+            $this->buffer = substr($this->buffer, self::ENCRYPT_READ_BYTES);
 
-        $newBucketData = $header.sodium_crypto_secretstream_xchacha20poly1305_push($this->state, $data);
+            $newBucketData = $header.sodium_crypto_secretstream_xchacha20poly1305_push($this->state, $data);
 
-        \assert(\is_resource($this->stream));
-        $newBucket = stream_bucket_new(
-            $this->stream,
-            $newBucketData
-        );
-        $consumed += \strlen($data);
-        stream_bucket_append($out, $newBucket);
+            \assert(\is_resource($this->stream));
+            $newBucket = stream_bucket_new(
+                $this->stream,
+                $newBucketData
+            );
+            $consumed += \strlen($data);
+            stream_bucket_append($out, $newBucket);
 
-        if ($closing) {
-            while ('' !== $this->buffer) {
-                $data = substr($this->buffer, 0, self::ENCRYPT_READ_BYTES);
-                $this->buffer = substr($this->buffer, self::ENCRYPT_READ_BYTES);
-
-                $newBucketData = sodium_crypto_secretstream_xchacha20poly1305_push($this->state, $data);
-
-                \assert(\is_resource($this->stream));
-                $newBucket = stream_bucket_new(
-                    $this->stream,
-                    $newBucketData
-                );
-                $consumed += \strlen($data);
-                stream_bucket_append($out, $newBucket);
+            $header = '';
+            if (!$closing) {
+                break;
             }
         }
 
@@ -182,7 +172,6 @@ final class EncryptorStreamFilter extends php_user_filter
             return PSFS_FEED_ME;
         }
 
-        $header = '';
         if (null === $this->state) {
             $header = substr($this->buffer, 0, SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_HEADERBYTES);
             $this->buffer = substr($this->buffer, SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_HEADERBYTES);
@@ -196,34 +185,23 @@ final class EncryptorStreamFilter extends php_user_filter
             return PSFS_FEED_ME;
         }
 
-        $data = substr($this->buffer, 0, self::DECRYPT_READ_BYTES);
-        $this->buffer = substr($this->buffer, self::DECRYPT_READ_BYTES);
+        while ('' !== $this->buffer) {
+            $data = substr($this->buffer, 0, self::DECRYPT_READ_BYTES);
+            $this->buffer = substr($this->buffer, self::DECRYPT_READ_BYTES);
 
-        [$newBucketData] = sodium_crypto_secretstream_xchacha20poly1305_pull($this->state, $data);
-        \assert(\is_string($newBucketData));
+            [$newBucketData] = sodium_crypto_secretstream_xchacha20poly1305_pull($this->state, $data);
+            \assert(\is_string($newBucketData));
 
-        \assert(\is_resource($this->stream));
-        $newBucket = stream_bucket_new(
-            $this->stream,
-            $newBucketData
-        );
-        $consumed += \strlen($header) + \strlen($data);
-        stream_bucket_append($out, $newBucket);
+            \assert(\is_resource($this->stream));
+            $newBucket = stream_bucket_new(
+                $this->stream,
+                $newBucketData
+            );
+            $consumed += \strlen($data);
+            stream_bucket_append($out, $newBucket);
 
-        if ($closing) {
-            while ('' !== $this->buffer) {
-                $data = substr($this->buffer, 0, self::DECRYPT_READ_BYTES);
-                $this->buffer = substr($this->buffer, self::DECRYPT_READ_BYTES);
-
-                [$newBucketData] = sodium_crypto_secretstream_xchacha20poly1305_pull($this->state, $data);
-                \assert(\is_string($newBucketData));
-
-                $newBucket = stream_bucket_new(
-                    $this->stream,
-                    $newBucketData
-                );
-                $consumed += \strlen($data);
-                stream_bucket_append($out, $newBucket);
+            if (!$closing) {
+                break;
             }
         }
 
