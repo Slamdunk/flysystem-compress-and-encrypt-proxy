@@ -112,7 +112,7 @@ final class CompressAndEncryptAdapterTest extends FilesystemAdapterTestCase
     }
 
     /**
-     * Delete this tests once https://github.com/thephpleague/flysystem/pull/1375 is released.
+     * Delete this test once https://github.com/thephpleague/flysystem/pull/1375 is released.
      *
      * @test
      */
@@ -132,7 +132,7 @@ final class CompressAndEncryptAdapterTest extends FilesystemAdapterTestCase
     }
 
     /**
-     * Delete this tests once https://github.com/thephpleague/flysystem/pull/1375 is released.
+     * Delete this test once https://github.com/thephpleague/flysystem/pull/1375 is released.
      *
      * @test
      */
@@ -199,10 +199,10 @@ final class CompressAndEncryptAdapterTest extends FilesystemAdapterTestCase
     {
         $adapter = $this->adapter();
         $this->givenWeHaveAnExistingFile('path1.txt', '123');
-        // $this->givenWeHaveAnExistingFile('path2.txt', '456');
+        $this->givenWeHaveAnExistingFile('path2.txt', '456');
 
         static::assertSame('123', $adapter->read('path1.txt'));
-        // static::assertSame('456', $adapter->read('path2.txt'));
+        static::assertSame('456', $adapter->read('path2.txt'));
     }
 
     protected static function createFilesystemAdapter(): FilesystemAdapter
