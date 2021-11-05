@@ -7,7 +7,7 @@
 [![Type Coverage](https://shepherd.dev/github/Slamdunk/flysystem-compress-and-encrypt-proxy/coverage.svg)](https://shepherd.dev/github/Slamdunk/flysystem-compress-and-encrypt-proxy)
 [![Infection MSI](https://badge.stryker-mutator.io/github.com/Slamdunk/flysystem-compress-and-encrypt-proxy/master)](https://dashboard.stryker-mutator.io/reports/github.com/Slamdunk/flysystem-compress-and-encrypt-proxy/master)
 
-Zip and Encrypt files before saving them to the final Flysystem destination.
+Compress and Encrypt files and streams before saving them to the final Flysystem destination.
 
 ## Installation
 
@@ -27,7 +27,7 @@ use League\Flysystem\AwsS3V3\AwsS3V3Adapter;
 // Create a strong key and save it somewhere
 $key = EncryptedZipProxyAdapter::generateKey();
 
-// Create the final FilesystemAdapter
+// Create the final FilesystemAdapter, for example Aws S3
 $remoteAdapter = new AwsS3V3Adapter(/* ... */);
 
 $adapter = new CompressAndEncryptAdapter(
@@ -42,3 +42,16 @@ $handle = fopen('my-huge-file.txt', 'r');
 $filesystem->writeStream('data.txt', $handle);
 fclose($handle);
 ```
+
+## Streams
+
+Both write and read operations leverage streams to keep memory usage low.
+
+## Compression
+
+`zlib.deflate` and `zlib.inflate` compression filters are used.
+
+## Encryption
+
+[Sodium](https://www.php.net/manual/en/book.sodium.php) extension provides the backend for the
+encrypted stream with [`XChaCha20-Poly1305`](https://www.php.net/manual/en/function.sodium-crypto-secretstream-xchacha20poly1305-init-push.php) algorithm.
