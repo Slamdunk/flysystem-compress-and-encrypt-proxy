@@ -117,12 +117,6 @@ final class EncryptorStreamFilter extends php_user_filter
             return PSFS_FEED_ME;
         }
 
-        // Tests tell that first $bucket always has more than self::ENCRYPT_READ_BYTES bytes
-        // if (self::ENCRYPT_READ_BYTES > \strlen($this->buffer) && !$closing) {
-        //     return PSFS_FEED_ME;
-        // }
-        \assert(!(self::ENCRYPT_READ_BYTES > \strlen($this->buffer) && !$closing));
-
         $header = '';
         if (null === $this->state) {
             \assert(\is_string($this->key));
@@ -131,7 +125,7 @@ final class EncryptorStreamFilter extends php_user_filter
             \assert(\is_string($header));
         }
 
-        while ('' !== $this->buffer) {
+        while (self::ENCRYPT_READ_BYTES <= \strlen($this->buffer) || $closing) {
             $data = substr($this->buffer, 0, self::ENCRYPT_READ_BYTES);
             $this->buffer = substr($this->buffer, self::ENCRYPT_READ_BYTES);
 
@@ -146,7 +140,7 @@ final class EncryptorStreamFilter extends php_user_filter
             stream_bucket_append($out, $newBucket);
 
             $header = '';
-            if (!$closing) {
+            if ($closing && '' === $this->buffer) {
                 break;
             }
         }
@@ -181,11 +175,7 @@ final class EncryptorStreamFilter extends php_user_filter
             sodium_memzero($this->key);
         }
 
-        if (self::DECRYPT_READ_BYTES > \strlen($this->buffer) && !$closing) {
-            return PSFS_FEED_ME;
-        }
-
-        while ('' !== $this->buffer) {
+        while (self::DECRYPT_READ_BYTES <= \strlen($this->buffer) || $closing) {
             $data = substr($this->buffer, 0, self::DECRYPT_READ_BYTES);
             $this->buffer = substr($this->buffer, self::DECRYPT_READ_BYTES);
 
@@ -200,7 +190,7 @@ final class EncryptorStreamFilter extends php_user_filter
             $consumed += \strlen($data);
             stream_bucket_append($out, $newBucket);
 
-            if (!$closing) {
+            if ($closing && '' === $this->buffer) {
                 break;
             }
         }

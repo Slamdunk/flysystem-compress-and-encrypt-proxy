@@ -22,9 +22,9 @@
                 "sodium_memzero\\(.+\\);"
             ]
         },
-        "GreaterThan": {
+        "LessThanOrEqualTo": {
             "ignoreSourceCodeByRegex": [
-                "if \\(self::DECRYPT_READ_BYTES > \\\\strlen\\(\\$this->buffer\\) && !\\$closing\\) {"
+                "while \\(self::ENCRYPT_READ_BYTES <= \\\\strlen\\(\\$this->buffer\\) || \\$closing\\) {"
             ]
         },
         "TrueValue": {
