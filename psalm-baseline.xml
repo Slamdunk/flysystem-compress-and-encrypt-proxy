@@ -10,12 +10,12 @@
       <code>$this-&gt;stream</code>
     </UndefinedThisPropertyFetch>
   </file>
-  <file src="test/EncryptedZipProxyAdapterTest.php">
+  <file src="test/CompressAndEncryptAdapterTest.php">
     <PropertyNotSetInConstructor occurrences="4">
       <code>$remoteMock</code>
-      <code>EncryptedZipProxyAdapterTest</code>
-      <code>EncryptedZipProxyAdapterTest</code>
-      <code>EncryptedZipProxyAdapterTest</code>
+      <code>CompressAndEncryptAdapterTest</code>
+      <code>CompressAndEncryptAdapterTest</code>
+      <code>CompressAndEncryptAdapterTest</code>
     </PropertyNotSetInConstructor>
   </file>
   <file src="test/EncryptorStreamFilterTest.php">
