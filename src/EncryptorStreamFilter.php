@@ -92,13 +92,6 @@ final class EncryptorStreamFilter extends php_user_filter
         return true;
     }
 
-    public function onClose(): void
-    {
-        if (null !== $this->state) {
-            sodium_memzero($this->state);
-        }
-    }
-
     /**
      * @param resource $in
      * @param resource $out
@@ -141,6 +134,8 @@ final class EncryptorStreamFilter extends php_user_filter
 
             $header = '';
             if ($closing && '' === $this->buffer) {
+                sodium_memzero($this->state);
+
                 break;
             }
         }
@@ -191,6 +186,8 @@ final class EncryptorStreamFilter extends php_user_filter
             stream_bucket_append($out, $newBucket);
 
             if ($closing && '' === $this->buffer) {
+                sodium_memzero($this->state);
+
                 break;
             }
         }
