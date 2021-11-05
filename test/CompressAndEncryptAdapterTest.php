@@ -114,6 +114,43 @@ final class CompressAndEncryptAdapterTest extends FilesystemAdapterTestCase
     /**
      * @test
      */
+    public function writing_a_file_with_a_stream(): void
+    {
+        $this->runScenario(function () {
+            $adapter = $this->adapter();
+            $writeStream = stream_with_contents('contents');
+
+            $adapter->writeStream('path.txt', $writeStream, new Config());
+            fclose($writeStream);
+            $fileExists = $adapter->fileExists('path.txt');
+
+            $this->assertTrue($fileExists);
+        });
+    }
+
+    /**
+     * @test
+     */
+    public function writing_a_file_with_an_empty_stream(): void
+    {
+        $this->runScenario(function () {
+            $adapter = $this->adapter();
+            $writeStream = stream_with_contents('');
+
+            $adapter->writeStream('path.txt', $writeStream, new Config());
+            fclose($writeStream);
+            $fileExists = $adapter->fileExists('path.txt');
+
+            $this->assertTrue($fileExists);
+
+            $contents = $adapter->read('path.txt');
+            $this->assertSame('', $contents);
+        });
+    }
+
+    /**
+     * @test
+     */
     public function deleting_a_directory(): void
     {
         $remoteMock = $this->createMock(FilesystemAdapter::class);

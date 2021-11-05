@@ -107,12 +107,10 @@ final class EncryptorStreamFilter extends php_user_filter
      */
     private function encryptFilter($in, $out, &$consumed, $closing): int
     {
-        $latestBucket = null;
         while (null !== ($bucket = stream_bucket_make_writeable($in))) {
             \assert(\is_string($bucket->data));
 
             $this->buffer .= $bucket->data;
-            $latestBucket = $bucket;
         }
 
         if ('' === $this->buffer) {
@@ -136,13 +134,15 @@ final class EncryptorStreamFilter extends php_user_filter
         $data = substr($this->buffer, 0, self::ENCRYPT_READ_BYTES);
         $this->buffer = substr($this->buffer, self::ENCRYPT_READ_BYTES);
 
-        \assert(null !== $latestBucket);
-        $latestBucket->data = $header.sodium_crypto_secretstream_xchacha20poly1305_push($this->state, $data);
-        \assert(\is_string($latestBucket->data));
-        $latestBucket->datalen = \strlen($latestBucket->data);
+        $newBucketData = $header.sodium_crypto_secretstream_xchacha20poly1305_push($this->state, $data);
 
+        \assert(\is_resource($this->stream));
+        $newBucket = stream_bucket_new(
+            $this->stream,
+            $newBucketData
+        );
         $consumed += \strlen($data);
-        stream_bucket_append($out, $latestBucket);
+        stream_bucket_append($out, $newBucket);
 
         if ($closing) {
             while ('' !== $this->buffer) {

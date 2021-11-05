@@ -58,6 +58,8 @@ final class CompressAndEncryptAdapter implements FilesystemAdapter
         rewind($stream);
 
         $this->writeStream($path, $stream, $config);
+
+        fclose($stream);
     }
 
     /**
