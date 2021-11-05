@@ -4,4 +4,3 @@
 composer.lock
 .phpunit.result.cache
 .php-cs-fixer.cache
-infections.log
