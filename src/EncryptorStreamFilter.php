@@ -29,7 +29,8 @@ final class EncryptorStreamFilter extends php_user_filter
             return;
         }
 
-        stream_filter_register(self::FILTERNAME_PREFIX.'.*', __CLASS__);
+        $success = stream_filter_register(self::FILTERNAME_PREFIX.'.*', __CLASS__);
+        \assert(true === $success);
         self::$filterRegistered = true;
     }
 
@@ -38,12 +39,13 @@ final class EncryptorStreamFilter extends php_user_filter
      */
     public static function appendEncryption($stream, string $key): void
     {
-        stream_filter_append(
+        $resource = stream_filter_append(
             $stream,
             self::FILTERNAME_PREFIX.self::MODE_ENCRYPT,
             STREAM_FILTER_ALL,
             $key
         );
+        \assert(false !== $resource);
     }
 
     /**
@@ -51,12 +53,13 @@ final class EncryptorStreamFilter extends php_user_filter
      */
     public static function appendDecryption($stream, string $key): void
     {
-        stream_filter_append(
+        $resource = stream_filter_append(
             $stream,
             self::FILTERNAME_PREFIX.self::MODE_DECRYPT,
             STREAM_FILTER_ALL,
             $key
         );
+        \assert(false !== $resource);
     }
 
     /**
@@ -67,38 +70,25 @@ final class EncryptorStreamFilter extends php_user_filter
      */
     public function filter($in, $out, &$consumed, $closing): int
     {
-        if (self::MODE_ENCRYPT === $this->mode) {
-            return $this->encryptFilter($in, $out, $consumed, $closing);
-        }
-
-        if (self::MODE_DECRYPT === $this->mode) {
-            return $this->decryptFilter($in, $out, $consumed, $closing);
-        }
-
-        return PSFS_ERR_FATAL;
+        return match ($this->mode) {
+            self::MODE_ENCRYPT => $this->encryptFilter($in, $out, $consumed, $closing),
+        self::MODE_DECRYPT => $this->decryptFilter($in, $out, $consumed, $closing),
+        };
     }
 
     public function onCreate(): bool
     {
-        if (self::FILTERNAME_PREFIX.self::MODE_ENCRYPT === $this->filtername) {
-            \assert(\is_string($this->params));
-            $this->key = $this->params;
-            sodium_memzero($this->params);
-            $this->mode = self::MODE_ENCRYPT;
+        \assert(\is_string($this->params));
+        $this->key = $this->params;
+        sodium_memzero($this->params);
 
-            return true;
-        }
+        \assert(\is_string($this->filtername));
+        $this->mode = match ($this->filtername) {
+            self::FILTERNAME_PREFIX.self::MODE_ENCRYPT => self::MODE_ENCRYPT,
+            self::FILTERNAME_PREFIX.self::MODE_DECRYPT => self::MODE_DECRYPT,
+        };
 
-        if (self::FILTERNAME_PREFIX.self::MODE_DECRYPT === $this->filtername) {
-            \assert(\is_string($this->params));
-            $this->key = $this->params;
-            sodium_memzero($this->params);
-            $this->mode = self::MODE_DECRYPT;
-
-            return true;
-        }
-
-        return false;
+        return true;
     }
 
     public function onClose(): void
@@ -116,17 +106,15 @@ final class EncryptorStreamFilter extends php_user_filter
      */
     private function encryptFilter($in, $out, &$consumed, $closing): int
     {
-        $output = false;
-        $lastBucket = null;
+        $latestBucket = null;
         while (null !== ($bucket = stream_bucket_make_writeable($in))) {
             \assert(\is_string($bucket->data));
 
             $this->buffer .= $bucket->data;
-            $lastBucket = $bucket;
-            $output = true;
+            $latestBucket = $bucket;
         }
 
-        if (!$output) {
+        if ('' === $this->buffer) {
             return PSFS_FEED_ME;
         }
 
@@ -145,23 +133,29 @@ final class EncryptorStreamFilter extends php_user_filter
         $data = substr($this->buffer, 0, self::ENCRYPT_READ_BYTES);
         $this->buffer = substr($this->buffer, self::ENCRYPT_READ_BYTES);
 
-        \assert(null !== $lastBucket);
-        $lastBucket->data = $header.sodium_crypto_secretstream_xchacha20poly1305_push($this->state, $data);
-        \assert(\is_string($lastBucket->data));
-        $lastBucket->datalen = \strlen($lastBucket->data);
+        \assert(null !== $latestBucket);
+        $latestBucket->data = $header.sodium_crypto_secretstream_xchacha20poly1305_push($this->state, $data);
+        \assert(\is_string($latestBucket->data));
+        $latestBucket->datalen = \strlen($latestBucket->data);
 
         $consumed += \strlen($data);
-        stream_bucket_append($out, $lastBucket);
+        stream_bucket_append($out, $latestBucket);
 
-        if ($closing && '' !== $this->buffer) {
-            $newBucketData = sodium_crypto_secretstream_xchacha20poly1305_push($this->state, $this->buffer);
+        if ($closing) {
+            while ('' !== $this->buffer) {
+                $data = substr($this->buffer, 0, self::ENCRYPT_READ_BYTES);
+                $this->buffer = substr($this->buffer, self::ENCRYPT_READ_BYTES);
 
-            $newBucket = stream_bucket_new(
-                $this->stream,
-                $newBucketData
-            );
-            $consumed += \strlen($this->buffer);
-            stream_bucket_append($out, $newBucket);
+                $newBucketData = sodium_crypto_secretstream_xchacha20poly1305_push($this->state, $data);
+
+                \assert(\is_resource($this->stream));
+                $newBucket = stream_bucket_new(
+                    $this->stream,
+                    $newBucketData
+                );
+                $consumed += \strlen($data);
+                stream_bucket_append($out, $newBucket);
+            }
         }
 
         return PSFS_PASS_ON;
@@ -175,25 +169,20 @@ final class EncryptorStreamFilter extends php_user_filter
      */
     private function decryptFilter($in, $out, &$consumed, $closing): int
     {
-        $output = false;
         while (null !== ($bucket = stream_bucket_make_writeable($in))) {
             \assert(\is_string($bucket->data));
 
             $this->buffer .= $bucket->data;
-            $output = true;
         }
 
-        if (!$output && !$closing) {
+        if ('' === $this->buffer) {
             return PSFS_FEED_ME;
         }
 
         $header = '';
         if (null === $this->state) {
-            if ('' === $this->buffer) {
-                return PSFS_FEED_ME;
-            }
-            $header = substr($this->buffer, 0, 24);
-            $this->buffer = substr($this->buffer, 24);
+            $header = substr($this->buffer, 0, SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_HEADERBYTES);
+            $this->buffer = substr($this->buffer, SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_HEADERBYTES);
 
             \assert(\is_string($this->key));
             $this->state = sodium_crypto_secretstream_xchacha20poly1305_init_pull($header, $this->key);
@@ -207,27 +196,32 @@ final class EncryptorStreamFilter extends php_user_filter
         $data = substr($this->buffer, 0, self::DECRYPT_READ_BYTES);
         $this->buffer = substr($this->buffer, self::DECRYPT_READ_BYTES);
 
-        $consumedData = \strlen($header) + \strlen($data);
         [$newBucketData] = sodium_crypto_secretstream_xchacha20poly1305_pull($this->state, $data);
         \assert(\is_string($newBucketData));
 
+        \assert(\is_resource($this->stream));
         $newBucket = stream_bucket_new(
             $this->stream,
             $newBucketData
         );
-        $consumed += $consumedData;
+        $consumed += \strlen($header) + \strlen($data);
         stream_bucket_append($out, $newBucket);
 
-        if ($closing && '' !== $this->buffer) {
-            [$newBucketData] = sodium_crypto_secretstream_xchacha20poly1305_pull($this->state, $this->buffer);
-            \assert(\is_string($newBucketData));
+        if ($closing) {
+            while ('' !== $this->buffer) {
+                $data = substr($this->buffer, 0, self::DECRYPT_READ_BYTES);
+                $this->buffer = substr($this->buffer, self::DECRYPT_READ_BYTES);
 
-            $newBucket = stream_bucket_new(
-                $this->stream,
-                $newBucketData
-            );
-            $consumed += \strlen($this->buffer);
-            stream_bucket_append($out, $newBucket);
+                [$newBucketData] = sodium_crypto_secretstream_xchacha20poly1305_pull($this->state, $data);
+                \assert(\is_string($newBucketData));
+
+                $newBucket = stream_bucket_new(
+                    $this->stream,
+                    $newBucketData
+                );
+                $consumed += \strlen($data);
+                stream_bucket_append($out, $newBucket);
+            }
         }
 
         return PSFS_PASS_ON;

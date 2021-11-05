@@ -1,35 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <files psalm-version="4.11.2@6fba5eb554f9507b72932f9c75533d8af593688d">
-  <file src="src/EncryptedZipProxyAdapter.php">
-    <UnusedFunctionCall occurrences="2">
-      <code>stream_filter_append</code>
-      <code>stream_filter_append</code>
-    </UnusedFunctionCall>
-  </file>
   <file src="src/EncryptorStreamFilter.php">
     <MissingConstructor occurrences="2">
       <code>$key</code>
       <code>$mode</code>
     </MissingConstructor>
-    <MixedArgument occurrences="3">
-      <code>$this-&gt;stream</code>
-      <code>$this-&gt;stream</code>
-      <code>$this-&gt;stream</code>
-    </MixedArgument>
     <UndefinedThisPropertyFetch occurrences="2">
       <code>$this-&gt;stream</code>
       <code>$this-&gt;stream</code>
     </UndefinedThisPropertyFetch>
-    <UnusedFunctionCall occurrences="3">
-      <code>stream_filter_append</code>
-      <code>stream_filter_append</code>
-      <code>stream_filter_register</code>
-    </UnusedFunctionCall>
   </file>
   <file src="test/EncryptedZipProxyAdapterTest.php">
-    <PropertyNotSetInConstructor occurrences="5">
+    <PropertyNotSetInConstructor occurrences="4">
       <code>$remoteMock</code>
-      <code>$zipPassword</code>
       <code>EncryptedZipProxyAdapterTest</code>
       <code>EncryptedZipProxyAdapterTest</code>
       <code>EncryptedZipProxyAdapterTest</code>
@@ -40,13 +23,5 @@
       <code>EncryptorStreamFilterTest</code>
       <code>EncryptorStreamFilterTest</code>
     </PropertyNotSetInConstructor>
-    <UnusedFunctionCall occurrences="6">
-      <code>stream_filter_append</code>
-      <code>stream_filter_append</code>
-      <code>stream_filter_append</code>
-      <code>stream_filter_append</code>
-      <code>stream_filter_append</code>
-      <code>stream_filter_append</code>
-    </UnusedFunctionCall>
   </file>
 </files>
