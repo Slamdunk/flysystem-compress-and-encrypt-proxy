@@ -49,7 +49,7 @@ Both write and read operations leverage streams to keep memory usage low.
 
 ## Compression
 
-`zlib.deflate` and `zlib.inflate` compression filters are used.
+GZip's `zlib.deflate` and `zlib.inflate` compression filters are used.
 
 ## Encryption
 

@@ -24,8 +24,6 @@ final class EncryptorStreamFilter extends php_user_filter
 
     private static bool $filterRegistered = false;
 
-    // public $stream;
-
     public static function register(): void
     {
         if (self::$filterRegistered) {
@@ -121,6 +119,7 @@ final class EncryptorStreamFilter extends php_user_filter
             return PSFS_FEED_ME;
         }
 
+        // Tests tell that first $bucket always has more than self::ENCRYPT_READ_BYTES bytes
         // if (self::ENCRYPT_READ_BYTES > \strlen($this->buffer) && !$closing) {
         //     return PSFS_FEED_ME;
         // }
