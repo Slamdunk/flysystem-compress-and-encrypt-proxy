@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace SlamCompressAndEncryptProxy;
 
+use InvalidArgumentException;
 use League\Flysystem\Config;
 use League\Flysystem\FileAttributes;
 use League\Flysystem\FilesystemAdapter;
@@ -20,7 +21,7 @@ final class CompressAndEncryptAdapter implements FilesystemAdapter
     ) {
         $key = sodium_base642bin($key, SODIUM_BASE64_VARIANT_ORIGINAL);
         if (SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_KEYBYTES !== \strlen($key)) {
-            throw new WeakPasswordException(sprintf(
+            throw new InvalidArgumentException(sprintf(
                 'Provided key is not long exactly %s bytes. Consider using %s::generateKey() to get a strong one.',
                 SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_KEYBYTES,
                 __CLASS__

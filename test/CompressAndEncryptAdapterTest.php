@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace SlamCompressAndEncryptProxyTest;
 
+use InvalidArgumentException;
 use League\Flysystem\AdapterTestUtilities\FilesystemAdapterTestCase;
 use League\Flysystem\Config;
 use League\Flysystem\FileAttributes;
@@ -11,7 +12,6 @@ use League\Flysystem\FilesystemAdapter;
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use RuntimeException;
 use SlamCompressAndEncryptProxy\CompressAndEncryptAdapter;
-use SlamCompressAndEncryptProxy\WeakPasswordException;
 
 /**
  * @covers \SlamCompressAndEncryptProxy\CompressAndEncryptAdapter
@@ -55,7 +55,7 @@ final class CompressAndEncryptAdapterTest extends FilesystemAdapterTestCase
      */
     public function accept_long_enough_password_only(): void
     {
-        $this->expectException(WeakPasswordException::class);
+        $this->expectException(InvalidArgumentException::class);
 
         new CompressAndEncryptAdapter(
             $this->createMock(FilesystemAdapter::class),
