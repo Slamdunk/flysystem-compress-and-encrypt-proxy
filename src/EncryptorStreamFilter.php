@@ -6,6 +6,9 @@ namespace SlamFlysystemEncryptedZipProxy;
 
 use php_user_filter;
 
+/**
+ * @internal
+ */
 final class EncryptorStreamFilter extends php_user_filter
 {
     private const FILTERNAME_PREFIX = 'slamflysystemencryptor';
@@ -118,9 +121,9 @@ final class EncryptorStreamFilter extends php_user_filter
             return PSFS_FEED_ME;
         }
 
-        if (self::ENCRYPT_READ_BYTES > \strlen($this->buffer) && !$closing) {
-            return PSFS_FEED_ME;
-        }
+        // if (self::ENCRYPT_READ_BYTES > \strlen($this->buffer) && !$closing) {
+        //     return PSFS_FEED_ME;
+        // }
 
         $header = '';
         if (null === $this->state) {

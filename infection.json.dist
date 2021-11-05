@@ -6,7 +6,7 @@
     },
     "timeout": 10,
     "logs": {
-        "text": "infections.log",
+        "text": "php://stdout",
         "badge": {
             "branch": "master"
         }
@@ -22,19 +22,19 @@
                 "sodium_memzero\\(.+\\);"
             ]
         },
-        "BitwiseOr": {
+        "GreaterThan": {
             "ignoreSourceCodeByRegex": [
-                ".+ZipArchive::RDONLY . ZipArchive::CHECKCONS.+"
+                "if \\(self::DECRYPT_READ_BYTES > \\\\strlen\\(\\$this->buffer\\) && !\\$closing\\) {"
             ]
         },
-        "IncrementInteger": {
+        "TrueValue": {
             "ignoreSourceCodeByRegex": [
-                ".+random_bytes\\(\\d+\\).+"
+                "self::\\$filterRegistered = true;"
             ]
         },
-        "DecrementInteger": {
+        "UnwrapSubstr": {
             "ignoreSourceCodeByRegex": [
-                ".+random_bytes\\(\\d+\\).+"
+                ".+ = substr\\(\\$this->buffer,( 0,)? self::(EN|DE)CRYPT_READ_BYTES\\);"
             ]
         }
     },

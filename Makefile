@@ -23,9 +23,7 @@ test: vendor
 
 .PHONY: code-coverage
 code-coverage: test
-	rm -f infections.log
 	php -d zend.assertions=1 vendor/bin/infection \
 		--threads=$(shell nproc) \
 		--coverage=coverage \
-		--skip-initial-tests \
-	|| (cat infections.log && false)
+		--skip-initial-tests
