@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace SlamFlysystemEncryptedZipProxy;
+namespace SlamCompressAndEncryptProxy;
 
 use php_user_filter;
 

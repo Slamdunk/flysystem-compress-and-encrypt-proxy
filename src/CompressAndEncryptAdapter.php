@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace SlamFlysystemEncryptedZipProxy;
+namespace SlamCompressAndEncryptProxy;
 
 use League\Flysystem\Config;
 use League\Flysystem\FileAttributes;
 use League\Flysystem\FilesystemAdapter;
 
-final class EncryptedZipProxyAdapter implements FilesystemAdapter
+final class CompressAndEncryptAdapter implements FilesystemAdapter
 {
     public const REMOTE_FILE_EXTENSION = '.gz.encrypted';
     private FilesystemAdapter $remoteAdapter;

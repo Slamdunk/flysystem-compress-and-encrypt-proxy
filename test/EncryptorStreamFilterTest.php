@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace SlamFlysystemEncryptedZipProxyTest;
+namespace SlamCompressAndEncryptProxyTest;
 
 use PHPUnit\Framework\TestCase;
-use SlamFlysystemEncryptedZipProxy\EncryptorStreamFilter;
+use SlamCompressAndEncryptProxy\EncryptorStreamFilter;
 
 /**
- * @covers \SlamFlysystemEncryptedZipProxy\EncryptorStreamFilter
+ * @covers \SlamCompressAndEncryptProxy\EncryptorStreamFilter
  *
  * @internal
  */

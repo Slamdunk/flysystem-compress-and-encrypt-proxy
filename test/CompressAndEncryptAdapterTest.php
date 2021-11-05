@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace SlamFlysystemEncryptedZipProxyTest;
+namespace SlamCompressAndEncryptProxyTest;
 
 use League\Flysystem\AdapterTestUtilities\FilesystemAdapterTestCase;
 use League\Flysystem\Config;
@@ -10,18 +10,18 @@ use League\Flysystem\FileAttributes;
 use League\Flysystem\FilesystemAdapter;
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use RuntimeException;
-use SlamFlysystemEncryptedZipProxy\EncryptedZipProxyAdapter;
-use SlamFlysystemEncryptedZipProxy\WeakPasswordException;
+use SlamCompressAndEncryptProxy\CompressAndEncryptAdapter;
+use SlamCompressAndEncryptProxy\WeakPasswordException;
 
 /**
- * @covers \SlamFlysystemEncryptedZipProxy\EncryptedZipProxyAdapter
- * @covers \SlamFlysystemEncryptedZipProxy\EncryptorStreamFilter
+ * @covers \SlamCompressAndEncryptProxy\CompressAndEncryptAdapter
+ * @covers \SlamCompressAndEncryptProxy\EncryptorStreamFilter
  *
  * @internal
  */
-final class EncryptedZipProxyAdapterTest extends FilesystemAdapterTestCase
+final class CompressAndEncryptAdapterTest extends FilesystemAdapterTestCase
 {
-    private ?EncryptedZipProxyAdapter $customAdapter = null;
+    private ?CompressAndEncryptAdapter $customAdapter = null;
     private string $remoteMock;
 
     protected function setUp(): void
@@ -38,12 +38,12 @@ final class EncryptedZipProxyAdapterTest extends FilesystemAdapterTestCase
         delete_directory($this->remoteMock);
     }
 
-    public function adapter(): EncryptedZipProxyAdapter
+    public function adapter(): CompressAndEncryptAdapter
     {
         if (null === $this->customAdapter) {
-            $this->customAdapter = new EncryptedZipProxyAdapter(
+            $this->customAdapter = new CompressAndEncryptAdapter(
                 new LocalFilesystemAdapter($this->remoteMock),
-                EncryptedZipProxyAdapter::generateKey()
+                CompressAndEncryptAdapter::generateKey()
             );
         }
 
@@ -57,7 +57,7 @@ final class EncryptedZipProxyAdapterTest extends FilesystemAdapterTestCase
     {
         $this->expectException(WeakPasswordException::class);
 
-        new EncryptedZipProxyAdapter(
+        new CompressAndEncryptAdapter(
             $this->createMock(FilesystemAdapter::class),
             base64_encode(random_bytes(8))
         );
@@ -69,8 +69,8 @@ final class EncryptedZipProxyAdapterTest extends FilesystemAdapterTestCase
     public function generated_keys_differ(): void
     {
         static::assertNotSame(
-            EncryptedZipProxyAdapter::generateKey(),
-            EncryptedZipProxyAdapter::generateKey()
+            CompressAndEncryptAdapter::generateKey(),
+            CompressAndEncryptAdapter::generateKey()
         );
     }
 
@@ -79,7 +79,7 @@ final class EncryptedZipProxyAdapterTest extends FilesystemAdapterTestCase
      */
     public function generate_long_enough_key(): void
     {
-        static::assertGreaterThan(43, \strlen(EncryptedZipProxyAdapter::generateKey()));
+        static::assertGreaterThan(43, \strlen(CompressAndEncryptAdapter::generateKey()));
     }
 
     /**
@@ -117,9 +117,9 @@ final class EncryptedZipProxyAdapterTest extends FilesystemAdapterTestCase
     public function deleting_a_directory(): void
     {
         $remoteMock = $this->createMock(FilesystemAdapter::class);
-        $adapter = new EncryptedZipProxyAdapter(
+        $adapter = new CompressAndEncryptAdapter(
             $remoteMock,
-            EncryptedZipProxyAdapter::generateKey()
+            CompressAndEncryptAdapter::generateKey()
         );
 
         $path = uniqid('path_');
@@ -144,7 +144,7 @@ final class EncryptedZipProxyAdapterTest extends FilesystemAdapterTestCase
 
         static::assertFileDoesNotExist($this->remoteMock.'/file.txt');
         static::assertStringNotEqualsFile(
-            $this->remoteMock.'/file.txt'.EncryptedZipProxyAdapter::REMOTE_FILE_EXTENSION,
+            $this->remoteMock.'/file.txt'.CompressAndEncryptAdapter::REMOTE_FILE_EXTENSION,
             $contents
         );
     }
