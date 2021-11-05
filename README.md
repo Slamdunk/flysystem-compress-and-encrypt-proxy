@@ -55,3 +55,12 @@ GZip's `zlib.deflate` and `zlib.inflate` compression filters are used.
 
 [Sodium](https://www.php.net/manual/en/book.sodium.php) extension provides the backend for the
 encrypted stream with [`XChaCha20-Poly1305`](https://www.php.net/manual/en/function.sodium-crypto-secretstream-xchacha20poly1305-init-push.php) algorithm.
+
+## MIME types detection caveat
+
+Some Flysystem adapters like the Local one try to guess the file mime type by
+its nature (content or extension): in such cases it will fail due to the custom
+extention and the encrypted content.
+Other adapters like the Aws S3 one allow you to specify it manually (for ex.
+with the `ContentType` key in the Config): it is a good idea to always manually
+inject it, if you like the `Filesystem::mimeType($path)` call to be reliable.
