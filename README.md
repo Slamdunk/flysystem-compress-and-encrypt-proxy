@@ -38,14 +38,26 @@ $adapter = new CompressAndEncryptAdapter(
 // The FilesystemOperator
 $filesystem = new \League\Flysystem\Filesystem($adapter);
 
+// Upload a file, with stream
 $handle = fopen('my-huge-file.txt', 'r');
 $filesystem->writeStream('data.txt', $handle);
+fclose($handle);
+
+// Remotely a data.txt.gz.encrypted file has now been created
+
+// Download a file, with stream
+$handle = $filesystem->writeStream('data.txt');
+file_put_contents('my-huge-file.txt', $handle);
 fclose($handle);
 ```
 
 ## Streams
 
 Both write and read operations leverage streams to keep memory usage low.
+
+A 10 Gb `mysqldump` output can be streamed into a 1 Gb `dump.sql.gz.encrypted` file
+with a 10 Mb RAM footprint of the running php process, and no additional local disk
+space required.
 
 ## Compression
 
