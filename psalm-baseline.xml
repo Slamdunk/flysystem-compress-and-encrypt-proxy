@@ -19,30 +19,6 @@
     </PropertyNotSetInConstructor>
   </file>
   <file src="test/EncryptorStreamFilterTest.php">
-    <InternalClass occurrences="10">
-      <code>EncryptorStreamFilter::appendDecryption($plainStream, $key)</code>
-      <code>EncryptorStreamFilter::appendDecryption($plainStream, $key)</code>
-      <code>EncryptorStreamFilter::appendDecryption($plainStream1, $key)</code>
-      <code>EncryptorStreamFilter::appendDecryption($plainStream2, $key)</code>
-      <code>EncryptorStreamFilter::appendEncryption($cipherStream, $key)</code>
-      <code>EncryptorStreamFilter::appendEncryption($cipherStream1, $key)</code>
-      <code>EncryptorStreamFilter::appendEncryption($cipherStream2, $key)</code>
-      <code>EncryptorStreamFilter::register()</code>
-      <code>EncryptorStreamFilter::register()</code>
-      <code>EncryptorStreamFilter::register()</code>
-    </InternalClass>
-    <InternalMethod occurrences="10">
-      <code>EncryptorStreamFilter::appendDecryption($plainStream, $key)</code>
-      <code>EncryptorStreamFilter::appendDecryption($plainStream, $key)</code>
-      <code>EncryptorStreamFilter::appendDecryption($plainStream1, $key)</code>
-      <code>EncryptorStreamFilter::appendDecryption($plainStream2, $key)</code>
-      <code>EncryptorStreamFilter::appendEncryption($cipherStream, $key)</code>
-      <code>EncryptorStreamFilter::appendEncryption($cipherStream1, $key)</code>
-      <code>EncryptorStreamFilter::appendEncryption($cipherStream2, $key)</code>
-      <code>EncryptorStreamFilter::register()</code>
-      <code>EncryptorStreamFilter::register()</code>
-      <code>EncryptorStreamFilter::register()</code>
-    </InternalMethod>
     <PropertyNotSetInConstructor occurrences="2">
       <code>EncryptorStreamFilterTest</code>
       <code>EncryptorStreamFilterTest</code>

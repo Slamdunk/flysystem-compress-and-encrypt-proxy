@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace SlamCompressAndEncryptProxyTest;
+namespace SlamCompressAndEncryptProxy\Test;
 
 use InvalidArgumentException;
 use League\Flysystem\AdapterTestUtilities\FilesystemAdapterTestCase;

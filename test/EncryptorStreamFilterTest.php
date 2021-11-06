@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace SlamCompressAndEncryptProxyTest;
+namespace SlamCompressAndEncryptProxy\Test;
 
 use PHPUnit\Framework\TestCase;
 use SlamCompressAndEncryptProxy\EncryptorStreamFilter;
