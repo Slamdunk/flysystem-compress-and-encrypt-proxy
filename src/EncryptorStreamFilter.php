@@ -71,9 +71,19 @@ final class EncryptorStreamFilter extends php_user_filter
      */
     public function filter($in, $out, &$consumed, $closing): int
     {
+        while (null !== ($bucket = stream_bucket_make_writeable($in))) {
+            \assert(\is_string($bucket->data));
+
+            $this->buffer .= $bucket->data;
+        }
+
+        if ('' === $this->buffer) {
+            return PSFS_FEED_ME;
+        }
+
         return match ($this->mode) {
-            self::MODE_ENCRYPT => $this->encryptFilter($in, $out, $consumed, $closing),
-            self::MODE_DECRYPT => $this->decryptFilter($in, $out, $consumed, $closing),
+            self::MODE_ENCRYPT => $this->encryptFilter($out, $consumed, $closing),
+            self::MODE_DECRYPT => $this->decryptFilter($out, $consumed, $closing),
         };
     }
 
@@ -93,23 +103,12 @@ final class EncryptorStreamFilter extends php_user_filter
     }
 
     /**
-     * @param resource $in
      * @param resource $out
      * @param int      $consumed
      * @param bool     $closing
      */
-    private function encryptFilter($in, $out, &$consumed, $closing): int
+    private function encryptFilter($out, &$consumed, $closing): int
     {
-        while (null !== ($bucket = stream_bucket_make_writeable($in))) {
-            \assert(\is_string($bucket->data));
-
-            $this->buffer .= $bucket->data;
-        }
-
-        if ('' === $this->buffer) {
-            return PSFS_FEED_ME;
-        }
-
         $header = '';
         if (null === $this->state) {
             \assert(\is_string($this->key));
@@ -144,23 +143,12 @@ final class EncryptorStreamFilter extends php_user_filter
     }
 
     /**
-     * @param resource $in
      * @param resource $out
      * @param int      $consumed
      * @param bool     $closing
      */
-    private function decryptFilter($in, $out, &$consumed, $closing): int
+    private function decryptFilter($out, &$consumed, $closing): int
     {
-        while (null !== ($bucket = stream_bucket_make_writeable($in))) {
-            \assert(\is_string($bucket->data));
-
-            $this->buffer .= $bucket->data;
-        }
-
-        if ('' === $this->buffer) {
-            return PSFS_FEED_ME;
-        }
-
         if (null === $this->state) {
             $header = substr($this->buffer, 0, SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_HEADERBYTES);
             $this->buffer = substr($this->buffer, SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_HEADERBYTES);
