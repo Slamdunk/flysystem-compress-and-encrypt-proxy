@@ -71,11 +71,9 @@ final class EncryptorStreamFilterTest extends TestCase
         EncryptorStreamFilter::register();
 
         $cipherStream1 = $this->streamFromContents('123');
-        static::assertNotFalse(stream_filter_append($cipherStream1, 'zlib.deflate'));
         EncryptorStreamFilter::appendEncryption($cipherStream1, $key);
 
         $cipherStream2 = $this->streamFromContents('456');
-        static::assertNotFalse(stream_filter_append($cipherStream2, 'zlib.deflate'));
         EncryptorStreamFilter::appendEncryption($cipherStream2, $key);
 
         $cipher1 = stream_get_contents($cipherStream1);
@@ -86,11 +84,9 @@ final class EncryptorStreamFilterTest extends TestCase
 
         $plainStream1 = $this->streamFromContents($cipher1);
         EncryptorStreamFilter::appendDecryption($plainStream1, $key);
-        static::assertNotFalse(stream_filter_append($plainStream1, 'zlib.inflate'));
 
         $plainStream2 = $this->streamFromContents($cipher2);
         EncryptorStreamFilter::appendDecryption($plainStream2, $key);
-        static::assertNotFalse(stream_filter_append($plainStream2, 'zlib.inflate'));
 
         $plain1 = stream_get_contents($plainStream1);
         $plain2 = stream_get_contents($plainStream2);
@@ -100,6 +96,26 @@ final class EncryptorStreamFilterTest extends TestCase
 
         static::assertSame('123', $plain1);
         static::assertSame('456', $plain2);
+    }
+
+    /**
+     * @test
+     */
+    public function regression(): void
+    {
+        $key = base64_decode('Z+Ry4nDufKcJ19pU2pEMgGiac9GBWFjEV18Cpb9jxRM=', true);
+        $cipher = base64_decode('PMRzbW/xSj1WPnXp0DknCZvmM1Lv1XCYNbQH5wHozLpULVaGnoq7kVOuhg5Guew=', true);
+
+        EncryptorStreamFilter::register();
+
+        $plainStream = $this->streamFromContents($cipher);
+        EncryptorStreamFilter::appendDecryption($plainStream, $key);
+
+        $plain = stream_get_contents($plainStream);
+
+        fclose($plainStream);
+
+        static::assertSame('foobar', $plain);
     }
 
     /**

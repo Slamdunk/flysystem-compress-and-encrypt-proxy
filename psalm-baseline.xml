@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<files psalm-version="4.11.2@6fba5eb554f9507b72932f9c75533d8af593688d">
+<files psalm-version="4.12.0@e42bc4a23f67acba28a23bb09c348e2ff38a1d87">
   <file src="src/EncryptorStreamFilter.php">
     <MissingConstructor occurrences="2">
       <code>$key</code>
@@ -19,23 +19,27 @@
     </PropertyNotSetInConstructor>
   </file>
   <file src="test/EncryptorStreamFilterTest.php">
-    <InternalClass occurrences="8">
+    <InternalClass occurrences="10">
+      <code>EncryptorStreamFilter::appendDecryption($plainStream, $key)</code>
       <code>EncryptorStreamFilter::appendDecryption($plainStream, $key)</code>
       <code>EncryptorStreamFilter::appendDecryption($plainStream1, $key)</code>
       <code>EncryptorStreamFilter::appendDecryption($plainStream2, $key)</code>
       <code>EncryptorStreamFilter::appendEncryption($cipherStream, $key)</code>
       <code>EncryptorStreamFilter::appendEncryption($cipherStream1, $key)</code>
       <code>EncryptorStreamFilter::appendEncryption($cipherStream2, $key)</code>
+      <code>EncryptorStreamFilter::register()</code>
       <code>EncryptorStreamFilter::register()</code>
       <code>EncryptorStreamFilter::register()</code>
     </InternalClass>
-    <InternalMethod occurrences="8">
+    <InternalMethod occurrences="10">
+      <code>EncryptorStreamFilter::appendDecryption($plainStream, $key)</code>
       <code>EncryptorStreamFilter::appendDecryption($plainStream, $key)</code>
       <code>EncryptorStreamFilter::appendDecryption($plainStream1, $key)</code>
       <code>EncryptorStreamFilter::appendDecryption($plainStream2, $key)</code>
       <code>EncryptorStreamFilter::appendEncryption($cipherStream, $key)</code>
       <code>EncryptorStreamFilter::appendEncryption($cipherStream1, $key)</code>
       <code>EncryptorStreamFilter::appendEncryption($cipherStream2, $key)</code>
+      <code>EncryptorStreamFilter::register()</code>
       <code>EncryptorStreamFilter::register()</code>
       <code>EncryptorStreamFilter::register()</code>
     </InternalMethod>

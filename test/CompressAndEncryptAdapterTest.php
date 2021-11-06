@@ -178,7 +178,7 @@ final class CompressAndEncryptAdapterTest extends FilesystemAdapterTestCase
     /**
      * @test
      */
-    public function writing_a_file_writes_a_password_secured_zip(): void
+    public function writing_a_file_writes_a_compressed_and_encrypted_file(): void
     {
         $adapter = $this->adapter();
 
@@ -190,6 +190,23 @@ final class CompressAndEncryptAdapterTest extends FilesystemAdapterTestCase
             $this->remoteMock.'/file.txt'.CompressAndEncryptAdapter::REMOTE_FILE_EXTENSION,
             $contents
         );
+    }
+
+    /**
+     * @test
+     */
+    public function regression(): void
+    {
+        $key = 'RjWFkMrJS4Jd5TDdhYJNAWdfSEL5nptu4KQHgkeKGI0=';
+        $content = base64_decode('IZS+uLwIi3vfk+/txrq+7V7vQ0GGN9cwWetC8p/IRMstNUFfxB363Dt1jwxM7LbK3M4EX4earQ==', true);
+
+        $adapter = new CompressAndEncryptAdapter(
+            new LocalFilesystemAdapter($this->remoteMock),
+            $key
+        );
+        file_put_contents($this->remoteMock.'/file.txt'.CompressAndEncryptAdapter::REMOTE_FILE_EXTENSION, $content);
+
+        static::assertSame('foobar', $adapter->read('/file.txt'));
     }
 
     /**
