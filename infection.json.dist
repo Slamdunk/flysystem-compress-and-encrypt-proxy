@@ -34,7 +34,7 @@
         },
         "UnwrapSubstr": {
             "ignoreSourceCodeByRegex": [
-                ".+ = substr\\(\\$this->buffer,( 0,)? self::(EN|DE)CRYPT_READ_BYTES\\);"
+                ".+ = substr\\(\\$this->buffer,( 0,)? \\$(read|write)ChunkSize\\);"
             ]
         }
     },
