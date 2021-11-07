@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace SlamCompressAndEncryptProxy;
 
 use php_user_filter;
+use RuntimeException;
 
 /**
  * @internal
@@ -121,7 +122,16 @@ final class EncryptorStreamFilter extends php_user_filter
             $data = substr($this->buffer, 0, $readChunkSize);
             $this->buffer = substr($this->buffer, $readChunkSize);
 
-            $newBucketData = $header.sodium_crypto_secretstream_xchacha20poly1305_push($this->state, $data);
+            $tag = SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_TAG_MESSAGE;
+            if ($closing && '' === $this->buffer) {
+                $tag = SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_TAG_FINAL;
+            }
+            $newBucketData = $header.sodium_crypto_secretstream_xchacha20poly1305_push(
+                $this->state,
+                $data,
+                '',
+                $tag
+            );
 
             \assert(\is_resource($this->stream));
             $newBucket = stream_bucket_new(
@@ -163,9 +173,16 @@ final class EncryptorStreamFilter extends php_user_filter
             $data = substr($this->buffer, 0, $writeChunkSize);
             $this->buffer = substr($this->buffer, $writeChunkSize);
 
-            [$newBucketData] = sodium_crypto_secretstream_xchacha20poly1305_pull($this->state, $data);
+            $expectedTag = SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_TAG_MESSAGE;
+            if ($closing && '' === $this->buffer) {
+                $expectedTag = SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_TAG_FINAL;
+            }
+            [$newBucketData, $tag] = sodium_crypto_secretstream_xchacha20poly1305_pull($this->state, $data);
             \assert(\is_string($newBucketData));
 
+            if ($expectedTag !== $tag) {
+                throw new RuntimeException('Encrypted stream corrupted');
+            }
             \assert(\is_resource($this->stream));
             $newBucket = stream_bucket_new(
                 $this->stream,
