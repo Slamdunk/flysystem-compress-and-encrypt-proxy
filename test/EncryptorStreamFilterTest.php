@@ -135,9 +135,17 @@ final class EncryptorStreamFilterTest extends TestCase
     public function regression(): void
     {
         $key = base64_decode('Z+Ry4nDufKcJ19pU2pEMgGiac9GBWFjEV18Cpb9jxRM=', true);
-        $cipher = base64_decode('PMRzbW/xSj1WPnXp0DknCZvmM1Lv1XCYNbQH5wHozLpULVaGnoq7kVOuhg5Guew=', true);
-
+        $originalPlain = 'foobar';
         EncryptorStreamFilter::register();
+
+        // To recreate assets, uncomment following lines
+        // $cipherStream = $this->streamFromContents($content);
+        // EncryptorStreamFilter::appendEncryption($cipherStream, $key);
+        // $cipher = stream_get_contents($cipherStream);
+        // fclose($cipherStream);
+        // var_dump(base64_encode($cipher)); exit;
+
+        $cipher = base64_decode('UbQpWpd03RyW8a2YiVQSlkmfeEN76IgkN67yPRb7UoXcxUeL7LmUGizXL7zwbtc=', true);
 
         $plainStream = $this->streamFromContents($cipher);
         EncryptorStreamFilter::appendDecryption($plainStream, $key);
@@ -146,7 +154,7 @@ final class EncryptorStreamFilterTest extends TestCase
 
         fclose($plainStream);
 
-        static::assertSame('foobar', $plain);
+        static::assertSame($originalPlain, $plain);
     }
 
     /**
