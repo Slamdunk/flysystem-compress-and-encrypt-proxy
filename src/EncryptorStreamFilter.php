@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace SlamCompressAndEncryptProxy;
 
 use php_user_filter;
+use RuntimeException;
 
 /**
  * @internal
@@ -14,8 +15,7 @@ final class EncryptorStreamFilter extends php_user_filter
     private const FILTERNAME_PREFIX = 'slamflysystemencryptor';
     private const MODE_ENCRYPT = '.encrypt';
     private const MODE_DECRYPT = '.decrypt';
-    private const ENCRYPT_READ_BYTES = 8175;
-    private const DECRYPT_READ_BYTES = 8192;
+    private const CHUNK_SIZE = 8192;
 
     private ?string $key;
     private string $mode;
@@ -117,11 +117,21 @@ final class EncryptorStreamFilter extends php_user_filter
             \assert(\is_string($header));
         }
 
-        while (self::ENCRYPT_READ_BYTES <= \strlen($this->buffer) || $closing) {
-            $data = substr($this->buffer, 0, self::ENCRYPT_READ_BYTES);
-            $this->buffer = substr($this->buffer, self::ENCRYPT_READ_BYTES);
+        $readChunkSize = self::CHUNK_SIZE - SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_ABYTES;
+        while ($readChunkSize <= \strlen($this->buffer) || $closing) {
+            $data = substr($this->buffer, 0, $readChunkSize);
+            $this->buffer = substr($this->buffer, $readChunkSize);
 
-            $newBucketData = $header.sodium_crypto_secretstream_xchacha20poly1305_push($this->state, $data);
+            $tag = SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_TAG_MESSAGE;
+            if ($closing && '' === $this->buffer) {
+                $tag = SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_TAG_FINAL;
+            }
+            $newBucketData = $header.sodium_crypto_secretstream_xchacha20poly1305_push(
+                $this->state,
+                $data,
+                '',
+                $tag
+            );
 
             \assert(\is_resource($this->stream));
             $newBucket = stream_bucket_new(
@@ -158,13 +168,21 @@ final class EncryptorStreamFilter extends php_user_filter
             sodium_memzero($this->key);
         }
 
-        while (self::DECRYPT_READ_BYTES <= \strlen($this->buffer) || $closing) {
-            $data = substr($this->buffer, 0, self::DECRYPT_READ_BYTES);
-            $this->buffer = substr($this->buffer, self::DECRYPT_READ_BYTES);
+        $writeChunkSize = self::CHUNK_SIZE;
+        while ($writeChunkSize <= \strlen($this->buffer) || $closing) {
+            $data = substr($this->buffer, 0, $writeChunkSize);
+            $this->buffer = substr($this->buffer, $writeChunkSize);
 
-            [$newBucketData] = sodium_crypto_secretstream_xchacha20poly1305_pull($this->state, $data);
+            $expectedTag = SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_TAG_MESSAGE;
+            if ($closing && '' === $this->buffer) {
+                $expectedTag = SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_TAG_FINAL;
+            }
+            [$newBucketData, $tag] = sodium_crypto_secretstream_xchacha20poly1305_pull($this->state, $data);
             \assert(\is_string($newBucketData));
 
+            if ($expectedTag !== $tag) {
+                throw new RuntimeException('Encrypted stream corrupted');
+            }
             \assert(\is_resource($this->stream));
             $newBucket = stream_bucket_new(
                 $this->stream,

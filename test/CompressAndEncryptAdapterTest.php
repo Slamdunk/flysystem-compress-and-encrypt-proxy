@@ -198,15 +198,22 @@ final class CompressAndEncryptAdapterTest extends FilesystemAdapterTestCase
     public function regression(): void
     {
         $key = 'RjWFkMrJS4Jd5TDdhYJNAWdfSEL5nptu4KQHgkeKGI0=';
-        $content = base64_decode('IZS+uLwIi3vfk+/txrq+7V7vQ0GGN9cwWetC8p/IRMstNUFfxB363Dt1jwxM7LbK3M4EX4earQ==', true);
-
+        $originalPlain = 'foobar';
         $adapter = new CompressAndEncryptAdapter(
             new LocalFilesystemAdapter($this->remoteMock),
             $key
         );
+
+        // To recreate assets, uncomment following lines
+        // $adapter->write('/file.txt', $originalPlain, new Config());
+        // var_dump(
+        //     base64_encode(file_get_contents($this->remoteMock.'/file.txt'.CompressAndEncryptAdapter::REMOTE_FILE_EXTENSION))
+        // ); exit;
+
+        $content = base64_decode('Zp1CKRNAdEebRInjHnuJwuG1gI2owWedBVboddwd+sW4AKv/3a112UjHnlpJntUUZgPBStuSFw==', true);
         file_put_contents($this->remoteMock.'/file.txt'.CompressAndEncryptAdapter::REMOTE_FILE_EXTENSION, $content);
 
-        static::assertSame('foobar', $adapter->read('/file.txt'));
+        static::assertSame($originalPlain, $adapter->read('/file.txt'));
     }
 
     /**

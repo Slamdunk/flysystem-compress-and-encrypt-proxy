@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace SlamCompressAndEncryptProxy\Test;
 
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 use SlamCompressAndEncryptProxy\EncryptorStreamFilter;
 
 /**
@@ -65,6 +66,36 @@ final class EncryptorStreamFilterTest extends TestCase
     /**
      * @test
      */
+    public function detect_file_corruption(): void
+    {
+        $key = sodium_crypto_secretstream_xchacha20poly1305_keygen();
+        EncryptorStreamFilter::register();
+
+        $chunkSize = 8192;
+        $originalPlain = random_bytes(10 * ($chunkSize - SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_ABYTES));
+
+        $cipherStream = $this->streamFromContents($originalPlain);
+        EncryptorStreamFilter::appendEncryption($cipherStream, $key);
+
+        $cipher = stream_get_contents($cipherStream);
+        fclose($cipherStream);
+        static::assertNotSame($originalPlain, $cipher);
+        static::assertSame(
+            (10 * $chunkSize) + SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_HEADERBYTES,
+            \strlen($cipher)
+        );
+
+        $truncatedCipher = substr($cipher, 0, (9 * $chunkSize) + SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_HEADERBYTES);
+        $plainStream = $this->streamFromContents($truncatedCipher);
+        EncryptorStreamFilter::appendDecryption($plainStream, $key);
+
+        $this->expectException(RuntimeException::class);
+        stream_get_contents($plainStream);
+    }
+
+    /**
+     * @test
+     */
     public function consecutive_filtering(): void
     {
         $key = sodium_crypto_secretstream_xchacha20poly1305_keygen();
@@ -104,9 +135,17 @@ final class EncryptorStreamFilterTest extends TestCase
     public function regression(): void
     {
         $key = base64_decode('Z+Ry4nDufKcJ19pU2pEMgGiac9GBWFjEV18Cpb9jxRM=', true);
-        $cipher = base64_decode('PMRzbW/xSj1WPnXp0DknCZvmM1Lv1XCYNbQH5wHozLpULVaGnoq7kVOuhg5Guew=', true);
-
+        $originalPlain = 'foobar';
         EncryptorStreamFilter::register();
+
+        // To recreate assets, uncomment following lines
+        // $cipherStream = $this->streamFromContents($content);
+        // EncryptorStreamFilter::appendEncryption($cipherStream, $key);
+        // $cipher = stream_get_contents($cipherStream);
+        // fclose($cipherStream);
+        // var_dump(base64_encode($cipher)); exit;
+
+        $cipher = base64_decode('UbQpWpd03RyW8a2YiVQSlkmfeEN76IgkN67yPRb7UoXcxUeL7LmUGizXL7zwbtc=', true);
 
         $plainStream = $this->streamFromContents($cipher);
         EncryptorStreamFilter::appendDecryption($plainStream, $key);
@@ -115,7 +154,7 @@ final class EncryptorStreamFilterTest extends TestCase
 
         fclose($plainStream);
 
-        static::assertSame('foobar', $plain);
+        static::assertSame($originalPlain, $plain);
     }
 
     /**

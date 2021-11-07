@@ -23,5 +23,8 @@
       <code>EncryptorStreamFilterTest</code>
       <code>EncryptorStreamFilterTest</code>
     </PropertyNotSetInConstructor>
+    <UnusedFunctionCall occurrences="1">
+      <code>stream_get_contents</code>
+    </UnusedFunctionCall>
   </file>
 </files>
