@@ -46,7 +46,7 @@ fclose($handle);
 // Remotely a data.txt.gz.encrypted file has now been created
 
 // Download a file, with stream
-$handle = $filesystem->writeStream('data.txt');
+$handle = $filesystem->readStream('data.txt');
 file_put_contents('my-huge-file.txt', $handle);
 fclose($handle);
 ```
