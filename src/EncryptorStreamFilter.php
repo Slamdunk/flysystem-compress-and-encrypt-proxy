@@ -66,7 +66,7 @@ final class EncryptorStreamFilter extends php_user_filter
     /**
      * @param resource $in
      * @param resource $out
-     * @param int      $consumed
+     * @param ?int     $consumed
      * @param bool     $closing
      */
     public function filter($in, $out, &$consumed, $closing): int
@@ -81,10 +81,14 @@ final class EncryptorStreamFilter extends php_user_filter
             return PSFS_FEED_ME;
         }
 
-        return match ($this->mode) {
+        $consumed ??= 0;
+
+        match ($this->mode) {
             self::MODE_ENCRYPT => $this->encryptFilter($out, $consumed, $closing),
             self::MODE_DECRYPT => $this->decryptFilter($out, $consumed, $closing),
         };
+
+        return PSFS_PASS_ON;
     }
 
     public function onCreate(): bool
@@ -104,10 +108,8 @@ final class EncryptorStreamFilter extends php_user_filter
 
     /**
      * @param resource $out
-     * @param int      $consumed
-     * @param bool     $closing
      */
-    private function encryptFilter($out, &$consumed, $closing): int
+    private function encryptFilter($out, int &$consumed, bool $closing): void
     {
         $header = '';
         if (null === $this->state) {
@@ -145,19 +147,15 @@ final class EncryptorStreamFilter extends php_user_filter
             if ($closing && '' === $this->buffer) {
                 sodium_memzero($this->state);
 
-                break;
+                return;
             }
         }
-
-        return PSFS_PASS_ON;
     }
 
     /**
      * @param resource $out
-     * @param int      $consumed
-     * @param bool     $closing
      */
-    private function decryptFilter($out, &$consumed, $closing): int
+    private function decryptFilter($out, int &$consumed, bool $closing): void
     {
         if (null === $this->state) {
             $header = substr($this->buffer, 0, SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_HEADERBYTES);
@@ -194,10 +192,8 @@ final class EncryptorStreamFilter extends php_user_filter
             if ($closing && '' === $this->buffer) {
                 sodium_memzero($this->state);
 
-                break;
+                return;
             }
         }
-
-        return PSFS_PASS_ON;
     }
 }

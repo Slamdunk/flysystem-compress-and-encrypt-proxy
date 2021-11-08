@@ -21,19 +21,20 @@ $ composer require slam/flysystem-compress-and-encrypt-proxy
 
 ```php
 
-use SlamCompressAndEncryptProxy\CompressAndEncryptAdapter;
+use SlamCompressAndEncryptProxy\CompressAdapter;
+use SlamCompressAndEncryptProxy\EncryptAdapter;
 use League\Flysystem\AwsS3V3\AwsS3V3Adapter;
 
 // Create a strong key and save it somewhere
-$key = EncryptedZipProxyAdapter::generateKey();
+$key = EncryptAdapter::generateKey();
 
 // Create the final FilesystemAdapter, for example Aws S3
 $remoteAdapter = new AwsS3V3Adapter(/* ... */);
 
-$adapter = new CompressAndEncryptAdapter(
+$adapter = new CompressAdapter(new EncryptAdapter(
     $remoteAdapter,
     $key
-);
+));
 
 // The FilesystemOperator
 $filesystem = new \League\Flysystem\Filesystem($adapter);
@@ -63,12 +64,16 @@ space required.
 
 GZip's `zlib.deflate` and `zlib.inflate` compression filters are used.
 
+You can opt-out compression by using just the `EncryptAdapter`.
+
 ## Encryption
 
 [Sodium](https://www.php.net/manual/en/book.sodium.php) extension provides the backend for the
 encrypted stream with [`XChaCha20-Poly1305`](https://www.php.net/manual/en/function.sodium-crypto-secretstream-xchacha20poly1305-init-push.php) algorithm.
 
-## MIME types detection caveat
+## Caveats
+
+### MIME types detection
 
 Some Flysystem adapters like the Local one try to guess the file mime type by
 its nature (content or extension): in such cases it will fail due to the custom
@@ -76,3 +81,8 @@ extention and the encrypted content.
 Other adapters like the Aws S3 one allow you to specify it manually (for ex.
 with the `ContentType` key in the Config): it is a good idea to always manually
 inject it, if you like the `Filesystem::mimeType($path)` call to be reliable.
+
+### File size
+
+The file size returned relates to the compressed and encrypted file, not the
+original one.

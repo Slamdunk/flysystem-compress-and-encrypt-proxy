@@ -11,17 +11,21 @@ use League\Flysystem\FileAttributes;
 use League\Flysystem\FilesystemAdapter;
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use RuntimeException;
-use SlamCompressAndEncryptProxy\CompressAndEncryptAdapter;
+use SlamCompressAndEncryptProxy\CompressAdapter;
+use SlamCompressAndEncryptProxy\EncryptAdapter;
 
 /**
- * @covers \SlamCompressAndEncryptProxy\CompressAndEncryptAdapter
+ * @covers \SlamCompressAndEncryptProxy\AbstractProxyAdapter
+ * @covers \SlamCompressAndEncryptProxy\CompressAdapter
+ * @covers \SlamCompressAndEncryptProxy\EncryptAdapter
  * @covers \SlamCompressAndEncryptProxy\EncryptorStreamFilter
  *
  * @internal
  */
 final class CompressAndEncryptAdapterTest extends FilesystemAdapterTestCase
 {
-    private ?CompressAndEncryptAdapter $customAdapter = null;
+    private ?FilesystemAdapter $customAdapter = null;
+    private ?string $key = null;
     private string $remoteMock;
 
     protected function setUp(): void
@@ -38,12 +42,14 @@ final class CompressAndEncryptAdapterTest extends FilesystemAdapterTestCase
         delete_directory($this->remoteMock);
     }
 
-    public function adapter(): CompressAndEncryptAdapter
+    public function adapter(): FilesystemAdapter
     {
         if (null === $this->customAdapter) {
-            $this->customAdapter = new CompressAndEncryptAdapter(
-                new LocalFilesystemAdapter($this->remoteMock),
-                CompressAndEncryptAdapter::generateKey()
+            $this->customAdapter = new CompressAdapter(
+                new EncryptAdapter(
+                    new LocalFilesystemAdapter($this->remoteMock),
+                    $this->key ?? EncryptAdapter::generateKey()
+                )
             );
         }
 
@@ -57,7 +63,7 @@ final class CompressAndEncryptAdapterTest extends FilesystemAdapterTestCase
     {
         $this->expectException(InvalidArgumentException::class);
 
-        new CompressAndEncryptAdapter(
+        new EncryptAdapter(
             $this->createMock(FilesystemAdapter::class),
             base64_encode(random_bytes(8))
         );
@@ -69,8 +75,8 @@ final class CompressAndEncryptAdapterTest extends FilesystemAdapterTestCase
     public function generated_keys_differ(): void
     {
         static::assertNotSame(
-            CompressAndEncryptAdapter::generateKey(),
-            CompressAndEncryptAdapter::generateKey()
+            EncryptAdapter::generateKey(),
+            EncryptAdapter::generateKey()
         );
     }
 
@@ -79,7 +85,7 @@ final class CompressAndEncryptAdapterTest extends FilesystemAdapterTestCase
      */
     public function generate_long_enough_key(): void
     {
-        static::assertGreaterThan(43, \strlen(CompressAndEncryptAdapter::generateKey()));
+        static::assertGreaterThan(43, \strlen(EncryptAdapter::generateKey()));
     }
 
     /**
@@ -160,9 +166,11 @@ final class CompressAndEncryptAdapterTest extends FilesystemAdapterTestCase
     public function deleting_a_directory(): void
     {
         $remoteMock = $this->createMock(FilesystemAdapter::class);
-        $adapter = new CompressAndEncryptAdapter(
-            $remoteMock,
-            CompressAndEncryptAdapter::generateKey()
+        $adapter = new CompressAdapter(
+            new EncryptAdapter(
+                $remoteMock,
+                EncryptAdapter::generateKey()
+            ),
         );
 
         $path = uniqid('path_');
@@ -187,7 +195,7 @@ final class CompressAndEncryptAdapterTest extends FilesystemAdapterTestCase
 
         static::assertFileDoesNotExist($this->remoteMock.'/file.txt');
         static::assertStringNotEqualsFile(
-            $this->remoteMock.'/file.txt'.CompressAndEncryptAdapter::REMOTE_FILE_EXTENSION,
+            $this->remoteMock.'/file.txt'.CompressAdapter::getRemoteFileExtension().EncryptAdapter::getRemoteFileExtension(),
             $contents
         );
     }
@@ -197,21 +205,17 @@ final class CompressAndEncryptAdapterTest extends FilesystemAdapterTestCase
      */
     public function regression(): void
     {
-        $key = 'RjWFkMrJS4Jd5TDdhYJNAWdfSEL5nptu4KQHgkeKGI0=';
+        $this->key = 'RjWFkMrJS4Jd5TDdhYJNAWdfSEL5nptu4KQHgkeKGI0=';
+        $adapter = $this->adapter();
         $originalPlain = 'foobar';
-        $adapter = new CompressAndEncryptAdapter(
-            new LocalFilesystemAdapter($this->remoteMock),
-            $key
-        );
+        $remoteFilename = $this->remoteMock.'/file.txt'.CompressAdapter::getRemoteFileExtension().EncryptAdapter::getRemoteFileExtension();
 
         // To recreate assets, uncomment following lines
         // $adapter->write('/file.txt', $originalPlain, new Config());
-        // var_dump(
-        //     base64_encode(file_get_contents($this->remoteMock.'/file.txt'.CompressAndEncryptAdapter::REMOTE_FILE_EXTENSION))
-        // ); exit;
+        // var_dump(base64_encode(file_get_contents($remoteFilename))); exit;
 
         $content = base64_decode('Zp1CKRNAdEebRInjHnuJwuG1gI2owWedBVboddwd+sW4AKv/3a112UjHnlpJntUUZgPBStuSFw==', true);
-        file_put_contents($this->remoteMock.'/file.txt'.CompressAndEncryptAdapter::REMOTE_FILE_EXTENSION, $content);
+        file_put_contents($remoteFilename, $content);
 
         static::assertSame($originalPlain, $adapter->read('/file.txt'));
     }
