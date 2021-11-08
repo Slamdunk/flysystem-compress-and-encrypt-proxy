@@ -14,6 +14,7 @@ use RuntimeException;
 use SlamCompressAndEncryptProxy\CompressAndEncryptAdapter;
 
 /**
+ * @covers \SlamCompressAndEncryptProxy\AbstractProxyAdapter
  * @covers \SlamCompressAndEncryptProxy\CompressAndEncryptAdapter
  * @covers \SlamCompressAndEncryptProxy\EncryptorStreamFilter
  *
@@ -187,7 +188,7 @@ final class CompressAndEncryptAdapterTest extends FilesystemAdapterTestCase
 
         static::assertFileDoesNotExist($this->remoteMock.'/file.txt');
         static::assertStringNotEqualsFile(
-            $this->remoteMock.'/file.txt'.CompressAndEncryptAdapter::REMOTE_FILE_EXTENSION,
+            $this->remoteMock.'/file.txt'.CompressAndEncryptAdapter::getRemoteFileExtension(),
             $contents
         );
     }
@@ -211,7 +212,7 @@ final class CompressAndEncryptAdapterTest extends FilesystemAdapterTestCase
         // ); exit;
 
         $content = base64_decode('Zp1CKRNAdEebRInjHnuJwuG1gI2owWedBVboddwd+sW4AKv/3a112UjHnlpJntUUZgPBStuSFw==', true);
-        file_put_contents($this->remoteMock.'/file.txt'.CompressAndEncryptAdapter::REMOTE_FILE_EXTENSION, $content);
+        file_put_contents($this->remoteMock.'/file.txt'.CompressAndEncryptAdapter::getRemoteFileExtension(), $content);
 
         static::assertSame($originalPlain, $adapter->read('/file.txt'));
     }
