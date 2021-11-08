@@ -15,7 +15,7 @@
         "@default": true,
         "global-ignoreSourceCodeByRegex": [
             "\\\\assert\\(.+\\);",
-            "\\$consumed .= .+;"
+            "\\$consumed ..?= .+;"
         ],
         "FunctionCallRemoval": {
             "ignoreSourceCodeByRegex": [
