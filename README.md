@@ -60,14 +60,16 @@ A 10 Gb `mysqldump` output can be streamed into a 1 Gb `dump.sql.gz.encrypted` f
 with a 10 Mb RAM footprint of the running php process, and no additional local disk
 space required.
 
+## Compression
+
+GZip's `zlib.deflate` and `zlib.inflate` compression filters are used.
+
+You can opt-out compression by using just the `EncryptAdapter`.
+
 ## Encryption
 
 [Sodium](https://www.php.net/manual/en/book.sodium.php) extension provides the backend for the
 encrypted stream with [`XChaCha20-Poly1305`](https://www.php.net/manual/en/function.sodium-crypto-secretstream-xchacha20poly1305-init-push.php) algorithm.
-
-## Compression
-
-GZip's `zlib.deflate` and `zlib.inflate` compression filters are used.
 
 ## Caveats
 
