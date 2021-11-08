@@ -15,7 +15,9 @@ use SlamCompressAndEncryptProxy\CompressAndEncryptAdapter;
 
 /**
  * @covers \SlamCompressAndEncryptProxy\AbstractProxyAdapter
+ * @covers \SlamCompressAndEncryptProxy\CompressAdapter
  * @covers \SlamCompressAndEncryptProxy\CompressAndEncryptAdapter
+ * @covers \SlamCompressAndEncryptProxy\EncryptAdapter
  * @covers \SlamCompressAndEncryptProxy\EncryptorStreamFilter
  *
  * @internal
