@@ -47,7 +47,11 @@ abstract class AbstractProxyAdapter implements FilesystemAdapter
      */
     final public function read(string $path): string
     {
-        return stream_get_contents($this->readStream($path));
+        $stream = $this->readStream($path);
+        $contents = stream_get_contents($this->readStream($path));
+        fclose($stream);
+
+        return $contents;
     }
 
     /**
