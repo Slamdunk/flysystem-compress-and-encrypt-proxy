@@ -63,6 +63,7 @@ jobs:
       matrix:
         php-version:
           - "8.0"
+          - "8.1"
 
     steps:
       - name: "Checkout"
@@ -94,6 +95,7 @@ jobs:
         run: "vendor/bin/phpunit --coverage-clover=coverage.xml --coverage-xml=coverage/coverage-xml --log-junit=coverage/junit.xml"
 
       - name: "Send code coverage report to Codecov.io"
+        if: ${{ matrix.php-version == '8.0' }}
         uses: codecov/codecov-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
