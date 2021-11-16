@@ -21,7 +21,7 @@ $ composer require slam/flysystem-compress-and-encrypt-proxy
 
 ```php
 
-use SlamCompressAndEncryptProxy\CompressAdapter;
+use SlamCompressAndEncryptProxy\GzipAdapter;
 use SlamCompressAndEncryptProxy\EncryptAdapter;
 use League\Flysystem\AwsS3V3\AwsS3V3Adapter;
 
@@ -31,7 +31,7 @@ $key = EncryptAdapter::generateKey();
 // Create the final FilesystemAdapter, for example Aws S3
 $remoteAdapter = new AwsS3V3Adapter(/* ... */);
 
-$adapter = new CompressAdapter(new EncryptAdapter(
+$adapter = new GzipAdapter(new EncryptAdapter(
     $remoteAdapter,
     $key
 ));

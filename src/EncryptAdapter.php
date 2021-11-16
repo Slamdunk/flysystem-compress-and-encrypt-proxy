@@ -23,7 +23,7 @@ final class EncryptAdapter extends AbstractProxyAdapter
             ));
         }
 
-        EncryptorStreamFilter::register();
+        EncryptStreamFilter::register();
 
         parent::__construct($remoteAdapter);
     }
@@ -46,7 +46,7 @@ final class EncryptAdapter extends AbstractProxyAdapter
      */
     public function writeStream(string $path, $contents, Config $config): void
     {
-        EncryptorStreamFilter::appendEncryption($contents, $this->key);
+        EncryptStreamFilter::appendEncryption($contents, $this->key);
 
         $this->getRemoteAdapter()->writeStream($this->getRemotePath($path), $contents, $config);
     }
@@ -58,7 +58,7 @@ final class EncryptAdapter extends AbstractProxyAdapter
     {
         $contents = $this->getRemoteAdapter()->readStream($this->getRemotePath($path));
 
-        EncryptorStreamFilter::appendDecryption($contents, $this->key);
+        EncryptStreamFilter::appendDecryption($contents, $this->key);
 
         return $contents;
     }

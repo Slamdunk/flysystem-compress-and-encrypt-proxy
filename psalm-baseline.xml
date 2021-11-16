@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <files psalm-version="4.12.0@e42bc4a23f67acba28a23bb09c348e2ff38a1d87">
-  <file src="src/EncryptorStreamFilter.php">
+  <file src="src/EncryptStreamFilter.php">
     <MissingConstructor occurrences="2">
       <code>$key</code>
       <code>$mode</code>
@@ -10,6 +10,20 @@
       <code>$this-&gt;stream</code>
     </UndefinedThisPropertyFetch>
   </file>
+  <file src="src/GzipStreamFilter.php">
+    <MissingConstructor occurrences="3">
+      <code>$filename</code>
+      <code>$id</code>
+      <code>$mode</code>
+    </MissingConstructor>
+    <UndefinedThisPropertyFetch occurrences="2">
+      <code>$this-&gt;stream</code>
+      <code>$this-&gt;stream</code>
+    </UndefinedThisPropertyFetch>
+    <UnusedFunctionCall occurrences="1">
+      <code>hash_update</code>
+    </UnusedFunctionCall>
+  </file>
   <file src="test/CompressAndEncryptAdapterTest.php">
     <PropertyNotSetInConstructor occurrences="4">
       <code>$remoteMock</code>
@@ -18,12 +32,23 @@
       <code>CompressAndEncryptAdapterTest</code>
     </PropertyNotSetInConstructor>
   </file>
-  <file src="test/EncryptorStreamFilterTest.php">
+  <file src="test/EncryptStreamFilterTest.php">
     <PropertyNotSetInConstructor occurrences="2">
-      <code>EncryptorStreamFilterTest</code>
-      <code>EncryptorStreamFilterTest</code>
+      <code>EncryptStreamFilterTest</code>
+      <code>EncryptStreamFilterTest</code>
     </PropertyNotSetInConstructor>
     <UnusedFunctionCall occurrences="1">
+      <code>stream_get_contents</code>
+    </UnusedFunctionCall>
+  </file>
+  <file src="test/GzipStreamFilterTest.php">
+    <PropertyNotSetInConstructor occurrences="2">
+      <code>GzipStreamFilterTest</code>
+      <code>GzipStreamFilterTest</code>
+    </PropertyNotSetInConstructor>
+    <UnusedFunctionCall occurrences="3">
+      <code>stream_get_contents</code>
+      <code>stream_get_contents</code>
       <code>stream_get_contents</code>
     </UnusedFunctionCall>
   </file>

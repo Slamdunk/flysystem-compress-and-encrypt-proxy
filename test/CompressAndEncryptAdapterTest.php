@@ -11,14 +11,14 @@ use League\Flysystem\FileAttributes;
 use League\Flysystem\FilesystemAdapter;
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use RuntimeException;
-use SlamCompressAndEncryptProxy\CompressAdapter;
 use SlamCompressAndEncryptProxy\EncryptAdapter;
+use SlamCompressAndEncryptProxy\GzipAdapter;
 
 /**
  * @covers \SlamCompressAndEncryptProxy\AbstractProxyAdapter
- * @covers \SlamCompressAndEncryptProxy\CompressAdapter
  * @covers \SlamCompressAndEncryptProxy\EncryptAdapter
- * @covers \SlamCompressAndEncryptProxy\EncryptorStreamFilter
+ * @covers \SlamCompressAndEncryptProxy\EncryptStreamFilter
+ * @covers \SlamCompressAndEncryptProxy\GzipAdapter
  *
  * @internal
  */
@@ -45,7 +45,7 @@ final class CompressAndEncryptAdapterTest extends FilesystemAdapterTestCase
     public function adapter(): FilesystemAdapter
     {
         if (null === $this->customAdapter) {
-            $this->customAdapter = new CompressAdapter(
+            $this->customAdapter = new GzipAdapter(
                 new EncryptAdapter(
                     new LocalFilesystemAdapter($this->remoteMock),
                     $this->key ?? EncryptAdapter::generateKey()
@@ -166,7 +166,7 @@ final class CompressAndEncryptAdapterTest extends FilesystemAdapterTestCase
     public function deleting_a_directory(): void
     {
         $remoteMock = $this->createMock(FilesystemAdapter::class);
-        $adapter = new CompressAdapter(
+        $adapter = new GzipAdapter(
             new EncryptAdapter(
                 $remoteMock,
                 EncryptAdapter::generateKey()
@@ -195,7 +195,7 @@ final class CompressAndEncryptAdapterTest extends FilesystemAdapterTestCase
 
         static::assertFileDoesNotExist($this->remoteMock.'/file.txt');
         static::assertStringNotEqualsFile(
-            $this->remoteMock.'/file.txt'.CompressAdapter::getRemoteFileExtension().EncryptAdapter::getRemoteFileExtension(),
+            $this->remoteMock.'/file.txt'.GzipAdapter::getRemoteFileExtension().EncryptAdapter::getRemoteFileExtension(),
             $contents
         );
     }
@@ -208,7 +208,7 @@ final class CompressAndEncryptAdapterTest extends FilesystemAdapterTestCase
         $this->key = 'RjWFkMrJS4Jd5TDdhYJNAWdfSEL5nptu4KQHgkeKGI0=';
         $adapter = $this->adapter();
         $originalPlain = 'foobar';
-        $remoteFilename = $this->remoteMock.'/file.txt'.CompressAdapter::getRemoteFileExtension().EncryptAdapter::getRemoteFileExtension();
+        $remoteFilename = $this->remoteMock.'/file.txt'.GzipAdapter::getRemoteFileExtension().EncryptAdapter::getRemoteFileExtension();
 
         // To recreate assets, uncomment following lines
         // $adapter->write('/file.txt', $originalPlain, new Config());

@@ -10,7 +10,7 @@ use RuntimeException;
 /**
  * @internal
  */
-final class EncryptorStreamFilter extends php_user_filter
+final class EncryptStreamFilter extends php_user_filter
 {
     private const FILTERNAME_PREFIX = 'slamflysystemencryptor';
     private const MODE_ENCRYPT = '.encrypt';

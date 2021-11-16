@@ -17,6 +17,11 @@
             "\\\\assert\\(.+\\);",
             "\\$consumed ..?= .+;"
         ],
+        "ConcatOperandRemoval": {
+            "ignoreSourceCodeByRegex": [
+                "\\$newBucketData .= basename\\(\\$this->filename\\) . \"\\\\x00\";"
+            ]
+        },
         "FunctionCallRemoval": {
             "ignoreSourceCodeByRegex": [
                 "sodium_memzero\\(.+\\);"
@@ -34,7 +39,8 @@
         },
         "UnwrapSubstr": {
             "ignoreSourceCodeByRegex": [
-                ".+ = substr\\(\\$this->buffer,( 0,)? \\$(read|write)ChunkSize\\);"
+                ".+ = substr\\(\\$this->buffer,( 0,)? \\$(read|write)ChunkSize\\);",
+                ".+ = substr\\(\\$bucket->data, 0, (\\-)?self::(HEADER_LENGTH|FOOTER_LENGTH)\\);"
             ]
         }
     },
