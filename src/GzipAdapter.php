@@ -6,7 +6,7 @@ namespace SlamCompressAndEncryptProxy;
 
 use League\Flysystem\Config;
 
-final class CompressAdapter extends AbstractProxyAdapter
+final class GzipAdapter extends AbstractProxyAdapter
 {
     public static function getRemoteFileExtension(): string
     {
