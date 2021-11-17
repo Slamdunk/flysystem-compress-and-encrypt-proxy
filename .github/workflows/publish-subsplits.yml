@@ -1,11 +1,14 @@
 name: "Sub-Split Publishing"
 on:
+  push:
+    branches:
+      - "master"
   create:
     tags:
-      - '*'
+      - 'v*'
   delete:
     tags:
-      - '*'
+      - 'v*'
 
 jobs:
   publish_subsplits:
