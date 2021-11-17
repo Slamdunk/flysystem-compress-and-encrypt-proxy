@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace SlamCompressAndEncryptProxy\Test\Core;
+namespace SlamFlysystem\Test\Core;
 
 use League\Flysystem\AdapterTestUtilities\FilesystemAdapterTestCase;
 use League\Flysystem\Config;
 use League\Flysystem\FilesystemAdapter;
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use RuntimeException;
-use SlamCompressAndEncryptProxy\Core\AbstractProxyAdapter;
+use SlamFlysystem\Core\AbstractProxyAdapter;
 
 /**
- * @covers \SlamCompressAndEncryptProxy\Core\AbstractProxyAdapter
+ * @covers \SlamFlysystem\Core\AbstractProxyAdapter
  *
  * @internal
  */

@@ -15,14 +15,14 @@ Use composer to install these available packages:
 
 | Package name | Stream filter type | Adapter class |
 |---|---|---|
-|`slam/flysystem-v1encrypt-proxy`|Encryption with [`XChaCha20-Poly1305`](https://www.php.net/manual/en/function.sodium-crypto-secretstream-xchacha20poly1305-init-push.php) algo|`SlamCompressAndEncryptProxy\V1Encrypt\V1EncryptProxyAdapter`|
-|`slam/flysystem-gzip-proxy`|Gzip compression|`SlamCompressAndEncryptProxy\Gzip\GzipProxyAdapter`|
+|`slam/flysystem-v1encrypt-proxy`|Encryption with [`XChaCha20-Poly1305`](https://www.php.net/manual/en/function.sodium-crypto-secretstream-xchacha20poly1305-init-push.php) algo|`SlamFlysystem\V1Encrypt\V1EncryptProxyAdapter`|
+|`slam/flysystem-gzip-proxy`|Gzip compression|`SlamFlysystem\Gzip\GzipProxyAdapter`|
 
 ## Usage
 
 ```php
-use SlamCompressAndEncryptProxy\Gzip\GzipProxyAdapter;
-use SlamCompressAndEncryptProxy\V1Encrypt\V1EncryptProxyAdapter;
+use SlamFlysystem\Gzip\GzipProxyAdapter;
+use SlamFlysystem\V1Encrypt\V1EncryptProxyAdapter;
 use League\Flysystem\AwsS3V3\AwsS3V3Adapter;
 
 // Create a strong key and save it somewhere

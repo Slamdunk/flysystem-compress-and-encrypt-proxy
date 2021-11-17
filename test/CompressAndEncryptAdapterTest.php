@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace SlamCompressAndEncryptProxy\Test;
+namespace SlamFlysystem\Test;
 
 use InvalidArgumentException;
 use League\Flysystem\AdapterTestUtilities\FilesystemAdapterTestCase;
@@ -11,14 +11,14 @@ use League\Flysystem\FileAttributes;
 use League\Flysystem\FilesystemAdapter;
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use RuntimeException;
-use SlamCompressAndEncryptProxy\Gzip\GzipProxyAdapter;
-use SlamCompressAndEncryptProxy\V1Encrypt\V1EncryptProxyAdapter;
+use SlamFlysystem\Gzip\GzipProxyAdapter;
+use SlamFlysystem\V1Encrypt\V1EncryptProxyAdapter;
 
 /**
- * @covers \SlamCompressAndEncryptProxy\Gzip\GzipProxyAdapter
- * @covers \SlamCompressAndEncryptProxy\Gzip\GzipStreamFilter::register
- * @covers \SlamCompressAndEncryptProxy\V1Encrypt\V1EncryptProxyAdapter
- * @covers \SlamCompressAndEncryptProxy\V1Encrypt\V1EncryptStreamFilter::register
+ * @covers \SlamFlysystem\Gzip\GzipProxyAdapter
+ * @covers \SlamFlysystem\Gzip\GzipStreamFilter::register
+ * @covers \SlamFlysystem\V1Encrypt\V1EncryptProxyAdapter
+ * @covers \SlamFlysystem\V1Encrypt\V1EncryptStreamFilter::register
  *
  * @internal
  */

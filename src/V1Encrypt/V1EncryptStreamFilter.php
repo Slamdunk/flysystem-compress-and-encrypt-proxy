@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace SlamCompressAndEncryptProxy\V1Encrypt;
+namespace SlamFlysystem\V1Encrypt;
 
 use php_user_filter;
 use RuntimeException;

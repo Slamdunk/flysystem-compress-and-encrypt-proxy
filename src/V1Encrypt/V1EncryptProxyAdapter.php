@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace SlamCompressAndEncryptProxy\V1Encrypt;
+namespace SlamFlysystem\V1Encrypt;
 
 use InvalidArgumentException;
 use League\Flysystem\Config;
 use League\Flysystem\FilesystemAdapter;
-use SlamCompressAndEncryptProxy\Core\AbstractProxyAdapter;
+use SlamFlysystem\Core\AbstractProxyAdapter;
 
 final class V1EncryptProxyAdapter extends AbstractProxyAdapter
 {

@@ -19,7 +19,7 @@
     },
     "autoload": {
         "psr-4": {
-            "SlamCompressAndEncryptProxy\\V1Encrypt\\": ""
+            "SlamFlysystem\\V1Encrypt\\": ""
         }
     }
 }

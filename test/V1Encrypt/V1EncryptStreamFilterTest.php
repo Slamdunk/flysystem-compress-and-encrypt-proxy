@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace SlamCompressAndEncryptProxy\Test\V1Encrypt;
+namespace SlamFlysystem\Test\V1Encrypt;
 
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
-use SlamCompressAndEncryptProxy\V1Encrypt\V1EncryptStreamFilter;
+use SlamFlysystem\V1Encrypt\V1EncryptStreamFilter;
 
 /**
- * @covers \SlamCompressAndEncryptProxy\V1Encrypt\V1EncryptStreamFilter
+ * @covers \SlamFlysystem\V1Encrypt\V1EncryptStreamFilter
  *
  * @internal
  */
