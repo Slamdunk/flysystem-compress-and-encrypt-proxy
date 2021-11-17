@@ -2,12 +2,13 @@
 
 declare(strict_types=1);
 
-namespace SlamCompressAndEncryptProxy;
+namespace SlamCompressAndEncryptProxy\Gzip;
 
 use League\Flysystem\Config;
 use League\Flysystem\FilesystemAdapter;
+use SlamCompressAndEncryptProxy\Core\AbstractProxyAdapter;
 
-final class GzipAdapter extends AbstractProxyAdapter
+final class GzipProxyAdapter extends AbstractProxyAdapter
 {
     public function __construct(
         FilesystemAdapter $remoteAdapter

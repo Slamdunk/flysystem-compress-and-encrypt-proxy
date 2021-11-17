@@ -2,22 +2,22 @@
 
 declare(strict_types=1);
 
-namespace SlamCompressAndEncryptProxy\Test;
+namespace SlamCompressAndEncryptProxy\Test\V1Encrypt;
 
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
-use SlamCompressAndEncryptProxy\EncryptStreamFilter;
+use SlamCompressAndEncryptProxy\V1Encrypt\V1EncryptStreamFilter;
 
 /**
- * @covers \SlamCompressAndEncryptProxy\EncryptStreamFilter
+ * @covers \SlamCompressAndEncryptProxy\V1Encrypt\V1EncryptStreamFilter
  *
  * @internal
  */
-final class EncryptStreamFilterTest extends TestCase
+final class V1EncryptStreamFilterTest extends TestCase
 {
     protected function setUp(): void
     {
-        EncryptStreamFilter::register();
+        V1EncryptStreamFilter::register();
     }
 
     /**
@@ -33,14 +33,14 @@ final class EncryptStreamFilterTest extends TestCase
         if (null !== $additionalOutStream) {
             static::assertNotFalse(stream_filter_append($cipherStream, $additionalOutStream));
         }
-        EncryptStreamFilter::appendEncryption($cipherStream, $key);
+        V1EncryptStreamFilter::appendEncryption($cipherStream, $key);
 
         $cipher = stream_get_contents($cipherStream);
         fclose($cipherStream);
         static::assertNotSame($originalPlain, $cipher);
 
         $plainStream = $this->streamFromContents($cipher);
-        EncryptStreamFilter::appendDecryption($plainStream, $key);
+        V1EncryptStreamFilter::appendDecryption($plainStream, $key);
         if (null !== $additionalInStream) {
             static::assertNotFalse(stream_filter_append($plainStream, $additionalInStream));
         }
@@ -78,7 +78,7 @@ final class EncryptStreamFilterTest extends TestCase
         $originalPlain = random_bytes(10 * ($chunkSize - SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_ABYTES));
 
         $cipherStream = $this->streamFromContents($originalPlain);
-        EncryptStreamFilter::appendEncryption($cipherStream, $key);
+        V1EncryptStreamFilter::appendEncryption($cipherStream, $key);
 
         $cipher = stream_get_contents($cipherStream);
         fclose($cipherStream);
@@ -90,7 +90,7 @@ final class EncryptStreamFilterTest extends TestCase
 
         $truncatedCipher = substr($cipher, 0, (9 * $chunkSize) + SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_HEADERBYTES);
         $plainStream = $this->streamFromContents($truncatedCipher);
-        EncryptStreamFilter::appendDecryption($plainStream, $key);
+        V1EncryptStreamFilter::appendDecryption($plainStream, $key);
 
         $this->expectException(RuntimeException::class);
         stream_get_contents($plainStream);
@@ -104,10 +104,10 @@ final class EncryptStreamFilterTest extends TestCase
         $key = sodium_crypto_secretstream_xchacha20poly1305_keygen();
 
         $cipherStream1 = $this->streamFromContents('123');
-        EncryptStreamFilter::appendEncryption($cipherStream1, $key);
+        V1EncryptStreamFilter::appendEncryption($cipherStream1, $key);
 
         $cipherStream2 = $this->streamFromContents('456');
-        EncryptStreamFilter::appendEncryption($cipherStream2, $key);
+        V1EncryptStreamFilter::appendEncryption($cipherStream2, $key);
 
         $cipher1 = stream_get_contents($cipherStream1);
         $cipher2 = stream_get_contents($cipherStream2);
@@ -116,10 +116,10 @@ final class EncryptStreamFilterTest extends TestCase
         fclose($cipherStream2);
 
         $plainStream1 = $this->streamFromContents($cipher1);
-        EncryptStreamFilter::appendDecryption($plainStream1, $key);
+        V1EncryptStreamFilter::appendDecryption($plainStream1, $key);
 
         $plainStream2 = $this->streamFromContents($cipher2);
-        EncryptStreamFilter::appendDecryption($plainStream2, $key);
+        V1EncryptStreamFilter::appendDecryption($plainStream2, $key);
 
         $plain1 = stream_get_contents($plainStream1);
         $plain2 = stream_get_contents($plainStream2);
@@ -141,7 +141,7 @@ final class EncryptStreamFilterTest extends TestCase
 
         // To recreate assets, uncomment following lines
         // $cipherStream = $this->streamFromContents($content);
-        // EncryptStreamFilter::appendEncryption($cipherStream, $key);
+        // V1EncryptStreamFilter::appendEncryption($cipherStream, $key);
         // $cipher = stream_get_contents($cipherStream);
         // fclose($cipherStream);
         // var_dump(base64_encode($cipher)); exit;
@@ -149,7 +149,7 @@ final class EncryptStreamFilterTest extends TestCase
         $cipher = base64_decode('UbQpWpd03RyW8a2YiVQSlkmfeEN76IgkN67yPRb7UoXcxUeL7LmUGizXL7zwbtc=', true);
 
         $plainStream = $this->streamFromContents($cipher);
-        EncryptStreamFilter::appendDecryption($plainStream, $key);
+        V1EncryptStreamFilter::appendDecryption($plainStream, $key);
 
         $plain = stream_get_contents($plainStream);
 

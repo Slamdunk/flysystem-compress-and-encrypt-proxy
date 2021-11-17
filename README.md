@@ -20,9 +20,8 @@ $ composer require slam/flysystem-compress-and-encrypt-proxy
 ## Usage
 
 ```php
-
-use SlamCompressAndEncryptProxy\GzipAdapter;
-use SlamCompressAndEncryptProxy\EncryptAdapter;
+use SlamCompressAndEncryptProxy\Gzip\GzipProxyAdapter;
+use SlamCompressAndEncryptProxy\V1Encrypt\V1EncryptProxyAdapter;
 use League\Flysystem\AwsS3V3\AwsS3V3Adapter;
 
 // Create a strong key and save it somewhere
@@ -31,7 +30,7 @@ $key = EncryptAdapter::generateKey();
 // Create the final FilesystemAdapter, for example Aws S3
 $remoteAdapter = new AwsS3V3Adapter(/* ... */);
 
-$adapter = new GzipAdapter(new EncryptAdapter(
+$adapter = new GzipProxyAdapter(new V1EncryptProxyAdapter(
     $remoteAdapter,
     $key
 ));
@@ -64,7 +63,7 @@ space required.
 
 GZip's `zlib.deflate` and `zlib.inflate` compression filters are used.
 
-You can opt-out compression by using just the `EncryptAdapter`.
+You can opt-out compression by using just the `V1EncryptProxyAdapter`.
 
 ## Encryption
 
