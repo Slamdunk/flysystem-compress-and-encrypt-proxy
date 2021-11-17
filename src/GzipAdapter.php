@@ -5,9 +5,18 @@ declare(strict_types=1);
 namespace SlamCompressAndEncryptProxy;
 
 use League\Flysystem\Config;
+use League\Flysystem\FilesystemAdapter;
 
 final class GzipAdapter extends AbstractProxyAdapter
 {
+    public function __construct(
+        FilesystemAdapter $remoteAdapter
+    ) {
+        GzipStreamFilter::register();
+
+        parent::__construct($remoteAdapter);
+    }
+
     public static function getRemoteFileExtension(): string
     {
         return '.gz';
@@ -18,8 +27,7 @@ final class GzipAdapter extends AbstractProxyAdapter
      */
     public function writeStream(string $path, $contents, Config $config): void
     {
-        $zlibFilter = stream_filter_append($contents, 'zlib.deflate');
-        \assert(false !== $zlibFilter);
+        GzipStreamFilter::appendCompression($path, $contents);
 
         $this->getRemoteAdapter()->writeStream($this->getRemotePath($path), $contents, $config);
     }
@@ -31,8 +39,7 @@ final class GzipAdapter extends AbstractProxyAdapter
     {
         $contents = $this->getRemoteAdapter()->readStream($this->getRemotePath($path));
 
-        $zlibFilter = stream_filter_append($contents, 'zlib.inflate');
-        \assert(false !== $zlibFilter);
+        GzipStreamFilter::appendDecompression($path, $contents);
 
         return $contents;
     }
