@@ -1,7 +1,7 @@
 {
-    "name": "slam/flysystem-gzip-proxy",
+    "name": "slam/flysystem-v1encrypt-proxy",
     "type": "library",
-    "description": "FlySystem adapter to Gzip content before sending it to the real adapter",
+    "description": "FlySystem adapter to Encrypt content before sending it to the real adapter",
     "homepage": "https://github.com/slamdunk/flysystem-compress-and-encrypt-proxy",
     "license": "MIT",
     "authors": [
@@ -13,13 +13,13 @@
     ],
     "require": {
         "php": ">=8.0",
-        "ext-hash": "*",
+        "ext-sodium": "*",
         "league/flysystem": "^2.3.1",
         "slam/flysystem-core-proxy": "^0.3.0"
     },
     "autoload": {
         "psr-4": {
-            "SlamCompressAndEncryptProxy\\Gzip\\": ""
+            "SlamCompressAndEncryptProxy\\V1Encrypt\\": ""
         }
     }
 }
