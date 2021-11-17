@@ -1,0 +1,38 @@
+{
+    "name": "slam/flysystem-compress-and-encrypt-proxy",
+    "type": "library",
+    "description": "FlySystem adapter to compress and encrypt content before sending it to the real adapter",
+    "homepage": "https://github.com/slamdunk/flysystem-compress-and-encrypt-proxy",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Filippo Tessarotto",
+            "email": "zoeslam@gmail.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=8.0",
+        "ext-hash": "*",
+        "ext-sodium": "*",
+        "league/flysystem": "^2.3.1"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^v3.3.2",
+        "infection/infection": "^0.25.3",
+        "league/flysystem-adapter-test-utilities": "^2.3.1",
+        "malukenho/mcbumpface": "^1.1.5",
+        "phpunit/phpunit": "^9.5.10",
+        "vimeo/psalm": "^4.12.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "SlamCompressAndEncryptProxy\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "SlamCompressAndEncryptProxy\\Test\\": "test/"
+        }
+    }
+}
