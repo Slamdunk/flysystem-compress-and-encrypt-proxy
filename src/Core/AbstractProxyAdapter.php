@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace SlamCompressAndEncryptProxy;
+namespace SlamCompressAndEncryptProxy\Core;
 
 use League\Flysystem\Config;
 use League\Flysystem\FileAttributes;

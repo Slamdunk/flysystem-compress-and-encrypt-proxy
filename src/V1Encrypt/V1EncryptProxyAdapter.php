@@ -2,13 +2,14 @@
 
 declare(strict_types=1);
 
-namespace SlamCompressAndEncryptProxy;
+namespace SlamCompressAndEncryptProxy\V1Encrypt;
 
 use InvalidArgumentException;
 use League\Flysystem\Config;
 use League\Flysystem\FilesystemAdapter;
+use SlamCompressAndEncryptProxy\Core\AbstractProxyAdapter;
 
-final class EncryptAdapter extends AbstractProxyAdapter
+final class V1EncryptProxyAdapter extends AbstractProxyAdapter
 {
     public function __construct(
         FilesystemAdapter $remoteAdapter,
@@ -23,7 +24,7 @@ final class EncryptAdapter extends AbstractProxyAdapter
             ));
         }
 
-        EncryptStreamFilter::register();
+        V1EncryptStreamFilter::register();
 
         parent::__construct($remoteAdapter);
     }
@@ -46,7 +47,7 @@ final class EncryptAdapter extends AbstractProxyAdapter
      */
     public function writeStream(string $path, $contents, Config $config): void
     {
-        EncryptStreamFilter::appendEncryption($contents, $this->key);
+        V1EncryptStreamFilter::appendEncryption($contents, $this->key);
 
         $this->getRemoteAdapter()->writeStream($this->getRemotePath($path), $contents, $config);
     }
@@ -58,7 +59,7 @@ final class EncryptAdapter extends AbstractProxyAdapter
     {
         $contents = $this->getRemoteAdapter()->readStream($this->getRemotePath($path));
 
-        EncryptStreamFilter::appendDecryption($contents, $this->key);
+        V1EncryptStreamFilter::appendDecryption($contents, $this->key);
 
         return $contents;
     }

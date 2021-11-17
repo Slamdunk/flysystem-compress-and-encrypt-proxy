@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace SlamCompressAndEncryptProxy\Test;
+namespace SlamCompressAndEncryptProxy\Test\Core;
 
 use League\Flysystem\AdapterTestUtilities\FilesystemAdapterTestCase;
 use League\Flysystem\Config;
 use League\Flysystem\FilesystemAdapter;
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use RuntimeException;
-use SlamCompressAndEncryptProxy\AbstractProxyAdapter;
+use SlamCompressAndEncryptProxy\Core\AbstractProxyAdapter;
 
 /**
- * @covers \SlamCompressAndEncryptProxy\AbstractProxyAdapter
+ * @covers \SlamCompressAndEncryptProxy\Core\AbstractProxyAdapter
  *
  * @internal
  */
@@ -25,7 +25,7 @@ final class AbstractProxyAdapterTest extends FilesystemAdapterTestCase
     protected function setUp(): void
     {
         $testToken = (int) getenv('TEST_TOKEN');
-        $this->remoteMock = __DIR__.'/assets/'.$testToken.'_remote-mock';
+        $this->remoteMock = \dirname(__DIR__).'/assets/'.$testToken.'_remote-mock';
         reset_function_mocks();
         delete_directory($this->remoteMock);
     }

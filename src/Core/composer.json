@@ -1,0 +1,23 @@
+{
+    "name": "slam/flysystem-core-proxy",
+    "type": "library",
+    "description": "FlySystem core classes for proxy adapters",
+    "homepage": "https://github.com/slamdunk/flysystem-compress-and-encrypt-proxy",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Filippo Tessarotto",
+            "email": "zoeslam@gmail.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=8.0",
+        "league/flysystem": "^2.3.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "SlamCompressAndEncryptProxy\\Core\\": ""
+        }
+    }
+}

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace SlamCompressAndEncryptProxy;
+namespace SlamCompressAndEncryptProxy\Gzip;
 
 use php_user_filter;
 use RuntimeException;

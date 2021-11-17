@@ -11,14 +11,14 @@ use League\Flysystem\FileAttributes;
 use League\Flysystem\FilesystemAdapter;
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use RuntimeException;
-use SlamCompressAndEncryptProxy\EncryptAdapter;
-use SlamCompressAndEncryptProxy\GzipAdapter;
+use SlamCompressAndEncryptProxy\Gzip\GzipProxyAdapter;
+use SlamCompressAndEncryptProxy\V1Encrypt\V1EncryptProxyAdapter;
 
 /**
- * @covers \SlamCompressAndEncryptProxy\EncryptAdapter
- * @covers \SlamCompressAndEncryptProxy\EncryptStreamFilter::register
- * @covers \SlamCompressAndEncryptProxy\GzipAdapter
- * @covers \SlamCompressAndEncryptProxy\GzipStreamFilter::register
+ * @covers \SlamCompressAndEncryptProxy\Gzip\GzipProxyAdapter
+ * @covers \SlamCompressAndEncryptProxy\Gzip\GzipStreamFilter::register
+ * @covers \SlamCompressAndEncryptProxy\V1Encrypt\V1EncryptProxyAdapter
+ * @covers \SlamCompressAndEncryptProxy\V1Encrypt\V1EncryptStreamFilter::register
  *
  * @internal
  */
@@ -45,10 +45,10 @@ final class CompressAndEncryptAdapterTest extends FilesystemAdapterTestCase
     public function adapter(): FilesystemAdapter
     {
         if (null === $this->customAdapter) {
-            $this->customAdapter = new GzipAdapter(
-                new EncryptAdapter(
+            $this->customAdapter = new GzipProxyAdapter(
+                new V1EncryptProxyAdapter(
                     new LocalFilesystemAdapter($this->remoteMock),
-                    $this->key ?? EncryptAdapter::generateKey()
+                    $this->key ?? V1EncryptProxyAdapter::generateKey()
                 )
             );
         }
@@ -63,7 +63,7 @@ final class CompressAndEncryptAdapterTest extends FilesystemAdapterTestCase
     {
         $this->expectException(InvalidArgumentException::class);
 
-        new EncryptAdapter(
+        new V1EncryptProxyAdapter(
             $this->createMock(FilesystemAdapter::class),
             base64_encode(random_bytes(8))
         );
@@ -75,8 +75,8 @@ final class CompressAndEncryptAdapterTest extends FilesystemAdapterTestCase
     public function generated_keys_differ(): void
     {
         static::assertNotSame(
-            EncryptAdapter::generateKey(),
-            EncryptAdapter::generateKey()
+            V1EncryptProxyAdapter::generateKey(),
+            V1EncryptProxyAdapter::generateKey()
         );
     }
 
@@ -85,7 +85,7 @@ final class CompressAndEncryptAdapterTest extends FilesystemAdapterTestCase
      */
     public function generate_long_enough_key(): void
     {
-        static::assertGreaterThan(43, \strlen(EncryptAdapter::generateKey()));
+        static::assertGreaterThan(43, \strlen(V1EncryptProxyAdapter::generateKey()));
     }
 
     /**
@@ -172,7 +172,7 @@ final class CompressAndEncryptAdapterTest extends FilesystemAdapterTestCase
 
         static::assertFileDoesNotExist($this->remoteMock.'/file.txt');
         static::assertStringNotEqualsFile(
-            $this->remoteMock.'/file.txt'.GzipAdapter::getRemoteFileExtension().EncryptAdapter::getRemoteFileExtension(),
+            $this->remoteMock.'/file.txt'.GzipProxyAdapter::getRemoteFileExtension().V1EncryptProxyAdapter::getRemoteFileExtension(),
             $contents
         );
     }
@@ -185,7 +185,7 @@ final class CompressAndEncryptAdapterTest extends FilesystemAdapterTestCase
         $this->key = 'RjWFkMrJS4Jd5TDdhYJNAWdfSEL5nptu4KQHgkeKGI0=';
         $adapter = $this->adapter();
         $originalPlain = 'foobar';
-        $remoteFilename = $this->remoteMock.'/file.txt'.GzipAdapter::getRemoteFileExtension().EncryptAdapter::getRemoteFileExtension();
+        $remoteFilename = $this->remoteMock.'/file.txt'.GzipProxyAdapter::getRemoteFileExtension().V1EncryptProxyAdapter::getRemoteFileExtension();
 
         // To recreate assets, uncomment following lines
         // $adapter->write('/file.txt', $originalPlain, new Config());

@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace SlamCompressAndEncryptProxy\Test;
+namespace SlamCompressAndEncryptProxy\Test\Gzip;
 
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
-use SlamCompressAndEncryptProxy\GzipStreamFilter;
+use SlamCompressAndEncryptProxy\Gzip\GzipStreamFilter;
 
 /**
- * @covers \SlamCompressAndEncryptProxy\GzipStreamFilter
+ * @covers \SlamCompressAndEncryptProxy\Gzip\GzipStreamFilter
  *
  * @internal
  */

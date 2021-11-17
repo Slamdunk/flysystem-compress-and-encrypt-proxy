@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace SlamCompressAndEncryptProxy;
+namespace SlamCompressAndEncryptProxy\V1Encrypt;
 
 use php_user_filter;
 use RuntimeException;
@@ -10,7 +10,7 @@ use RuntimeException;
 /**
  * @internal
  */
-final class EncryptStreamFilter extends php_user_filter
+final class V1EncryptStreamFilter extends php_user_filter
 {
     private const FILTERNAME_PREFIX = 'slamflysystemencryptor';
     private const MODE_ENCRYPT = '.encrypt';
