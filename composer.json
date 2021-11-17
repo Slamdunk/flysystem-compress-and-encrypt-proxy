@@ -27,12 +27,12 @@
     },
     "autoload": {
         "psr-4": {
-            "SlamCompressAndEncryptProxy\\": "src/"
+            "SlamFlysystem\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "SlamCompressAndEncryptProxy\\Test\\": "test/"
+            "SlamFlysystem\\Test\\": "test/"
         }
     }
 }

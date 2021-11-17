@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace SlamCompressAndEncryptProxy\Gzip;
+namespace SlamFlysystem\Gzip;
 
 use League\Flysystem\Config;
 use League\Flysystem\FilesystemAdapter;
-use SlamCompressAndEncryptProxy\Core\AbstractProxyAdapter;
+use SlamFlysystem\Core\AbstractProxyAdapter;
 
 final class GzipProxyAdapter extends AbstractProxyAdapter
 {
