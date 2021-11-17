@@ -13,6 +13,7 @@ jobs:
     runs-on: "ubuntu-latest"
 
     strategy:
+      fail-fast: false
       matrix:
         php-version:
           - "8.0"
@@ -48,8 +49,8 @@ jobs:
           key: ${{ runner.os }}-php-${{ matrix.php-version }}-${{ matrix.dependencies }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-php-${{ matrix.php-version }}-${{ matrix.dependencies }}-composer-
 
-      - name: "Install dependencies"
-        run: "composer update --no-interaction --no-progress"
+      # - name: "Install dependencies"
+      #   run: "composer update --no-interaction --no-progress"
 
       - name: "Validate composer.json"
         run: "composer validate --strict"
@@ -57,11 +58,11 @@ jobs:
       - name: "Normalize composer.json"
         run: "composer-normalize --dry-run"
 
-      - name: "Check composer.json explicit dependencies"
-        run: "composer-require-checker"
+      # - name: "Check composer.json explicit dependencies"
+      #   run: "composer-require-checker"
 
-      - name: "Check composer.json unused dependencies"
-        run: "composer-unused --excludePackage=php"
+      # - name: "Check composer.json unused dependencies"
+      #   run: "composer-unused --excludePackage=php"
 
   # tests:
   #   name: "Tests"
