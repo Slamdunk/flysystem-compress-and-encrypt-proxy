@@ -1,7 +1,7 @@
 # Slam / flysystem-compress-and-encrypt-proxy
 
-[![Latest Stable Version](https://img.shields.io/packagist/v/slam/flysystem-compress-and-encrypt-proxy.svg)](https://packagist.org/packages/slam/flysystem-compress-and-encrypt-proxy)
-[![Downloads](https://img.shields.io/packagist/dt/slam/flysystem-compress-and-encrypt-proxy.svg)](https://packagist.org/packages/slam/flysystem-compress-and-encrypt-proxy)
+[![Latest Stable Version](https://img.shields.io/packagist/v/slam/flysystem-core-proxy.svg)](https://packagist.org/packages/slam/flysystem-core-proxy)
+[![Downloads](https://img.shields.io/packagist/dt/slam/flysystem-core-proxy.svg)](https://packagist.org/packages/slam/flysystem-core-proxy)
 [![Integrate](https://github.com/Slamdunk/flysystem-compress-and-encrypt-proxy/workflows/Integrate/badge.svg?branch=master)](https://github.com/Slamdunk/flysystem-compress-and-encrypt-proxy/actions)
 [![Code Coverage](https://codecov.io/gh/Slamdunk/flysystem-compress-and-encrypt-proxy/coverage.svg?branch=master)](https://codecov.io/gh/Slamdunk/flysystem-compress-and-encrypt-proxy?branch=master)
 [![Type Coverage](https://shepherd.dev/github/Slamdunk/flysystem-compress-and-encrypt-proxy/coverage.svg)](https://shepherd.dev/github/Slamdunk/flysystem-compress-and-encrypt-proxy)
@@ -9,13 +9,9 @@
 
 Compress and Encrypt files and streams before saving them to the final Flysystem destination.
 
-## Installation
+## Available packages
 
-To install with composer run the following command:
-
-```console
-$ composer require slam/flysystem-compress-and-encrypt-proxy
-```
+Use composer to install these available packages:
 
 ## Usage
 
