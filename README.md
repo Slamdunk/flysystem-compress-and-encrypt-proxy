@@ -15,8 +15,8 @@ Use composer to install these available packages:
 
 | Package name | Stream filter type | Adapter class |
 |---|---|---|
-|`slam/flysystem-v1encrypt-proxy`|Encryption with [`XChaCha20-Poly1305`](https://www.php.net/manual/en/function.sodium-crypto-secretstream-xchacha20poly1305-init-push.php) algo|`SlamFlysystem\V1Encrypt\V1EncryptProxyAdapter`|
-|`slam/flysystem-gzip-proxy`|Gzip compression|`SlamFlysystem\Gzip\GzipProxyAdapter`|
+|`slam/flysystem-v1encrypt-proxy`|[`XChaCha20-Poly1305`](https://www.php.net/manual/en/function.sodium-crypto-secretstream-xchacha20poly1305-init-push.php) Encryption|`SlamFlysystem\V1Encrypt\V1EncryptProxyAdapter`|
+|`slam/flysystem-gzip-proxy`|[`Gzip`](https://datatracker.ietf.org/doc/html/rfc1952) compression|`SlamFlysystem\Gzip\GzipProxyAdapter`|
 
 ## Usage
 
@@ -26,7 +26,7 @@ use SlamFlysystem\V1Encrypt\V1EncryptProxyAdapter;
 use League\Flysystem\AwsS3V3\AwsS3V3Adapter;
 
 // Create a strong key and save it somewhere
-$key = EncryptAdapter::generateKey();
+$key = V1EncryptProxyAdapter::generateKey();
 
 // Create the final FilesystemAdapter, for example Aws S3
 $remoteAdapter = new AwsS3V3Adapter(/* ... */);
