@@ -58,7 +58,8 @@
       <code>GzipStreamFilterTest</code>
       <code>GzipStreamFilterTest</code>
     </PropertyNotSetInConstructor>
-    <UnusedFunctionCall occurrences="3">
+    <UnusedFunctionCall occurrences="4">
+      <code>stream_get_contents</code>
       <code>stream_get_contents</code>
       <code>stream_get_contents</code>
       <code>stream_get_contents</code>

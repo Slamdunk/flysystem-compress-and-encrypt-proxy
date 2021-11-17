@@ -42,6 +42,8 @@ final class GzipStreamFilter extends php_user_filter
     private const FLG_FNAME = 8;
     private const FLG_FCOMMENT = 16;
 
+    private const HASH_ALGORITHM = 'crc32b';
+
     private string $id;
     private string $filename;
     private string $mode;
@@ -134,7 +136,7 @@ final class GzipStreamFilter extends php_user_filter
     {
         if (!isset(self::$register[$this->id])) {
             self::$register[$this->id] = [
-                'hash_context' => hash_init('crc32b'),
+                'hash_context' => hash_init(self::HASH_ALGORITHM),
                 'original_size' => 0,
                 'footer' => null,
             ];
@@ -180,10 +182,9 @@ final class GzipStreamFilter extends php_user_filter
                 $this->started = true;
             }
 
-            if (self::MODE_DECOMPRESS_OPEN === $this->mode && $closing) {
+            if (self::MODE_DECOMPRESS_OPEN === $this->mode) {
                 \assert(\is_string($bucket->data));
                 self::$register[$this->id]['footer'] = substr($bucket->data, -self::FOOTER_LENGTH);
-                $bucket->data = substr($bucket->data, 0, -self::FOOTER_LENGTH);
             }
 
             if (self::MODE_COMPRESS_OPEN === $this->mode || self::MODE_DECOMPRESS_CLOSE === $this->mode) {
@@ -201,13 +202,7 @@ final class GzipStreamFilter extends php_user_filter
             $feeded = true;
         }
 
-        if (!$feeded) {
-            return PSFS_FEED_ME;
-        }
-
         if (self::MODE_COMPRESS_CLOSE === $this->mode && $closing) {
-            \assert(isset(self::$register[$this->id]));
-
             $crc = hash_final(self::$register[$this->id]['hash_context'], true);
             $newBucketData = $crc[3].$crc[2].$crc[1].$crc[0];
             $newBucketData .= pack('V', self::$register[$this->id]['original_size']);
@@ -222,10 +217,7 @@ final class GzipStreamFilter extends php_user_filter
             unset(self::$register[$this->id]);
         }
 
-        if (self::MODE_DECOMPRESS_CLOSE === $this->mode && $closing) {
-            \assert(isset(self::$register[$this->id]));
-            \assert(\is_string(self::$register[$this->id]['footer']));
-
+        if (self::MODE_DECOMPRESS_OPEN === $this->mode && !$feeded && \is_string(self::$register[$this->id]['footer'])) {
             $crc = hash_final(self::$register[$this->id]['hash_context'], true);
             if ($crc[3].$crc[2].$crc[1].$crc[0] !== substr(self::$register[$this->id]['footer'], 0, 4)) {
                 throw new RuntimeException('CRC32 checksum failed for '.$this->filename);
@@ -234,6 +226,12 @@ final class GzipStreamFilter extends php_user_filter
             if (self::$register[$this->id]['original_size'] !== $fileSize['size']) {
                 throw new RuntimeException('File size differs for '.$this->filename);
             }
+
+            self::$register[$this->id]['footer'] = null;
+        }
+
+        if (!$feeded) {
+            return PSFS_FEED_ME;
         }
 
         return PSFS_PASS_ON;

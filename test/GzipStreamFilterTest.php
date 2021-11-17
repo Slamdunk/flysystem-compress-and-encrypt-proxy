@@ -15,6 +15,11 @@ use SlamCompressAndEncryptProxy\GzipStreamFilter;
  */
 final class GzipStreamFilterTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        GzipStreamFilter::register();
+    }
+
     /**
      * @test
      */
@@ -27,7 +32,6 @@ final class GzipStreamFilterTest extends TestCase
             .'reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla '
             .'pariatur. Excepteur sint occaecat cupidatat non proident, sunt in '
             .'culpa qui officia deserunt mollit anim id est laborum.';
-        GzipStreamFilter::register();
 
         $compressedStream = $this->streamFromContents($originalPlain);
         GzipStreamFilter::appendCompression('file.txt', $compressedStream);
@@ -53,7 +57,6 @@ final class GzipStreamFilterTest extends TestCase
     public function detect_file_header_corruption(): void
     {
         $originalPlain = uniqid('contents_');
-        GzipStreamFilter::register();
 
         $compressedStream = $this->streamFromContents($originalPlain);
         GzipStreamFilter::appendCompression('file.txt', $compressedStream);
@@ -77,7 +80,6 @@ final class GzipStreamFilterTest extends TestCase
     public function detect_file_checksum_corruption(): void
     {
         $originalPlain = uniqid('contents_');
-        GzipStreamFilter::register();
 
         $compressedStream = $this->streamFromContents($originalPlain);
         GzipStreamFilter::appendCompression('file.txt', $compressedStream);
@@ -105,7 +107,6 @@ final class GzipStreamFilterTest extends TestCase
     public function detect_file_size_corruption(): void
     {
         $originalPlain = uniqid('contents_');
-        GzipStreamFilter::register();
 
         $compressedStream = $this->streamFromContents($originalPlain);
         GzipStreamFilter::appendCompression('file.txt', $compressedStream);
@@ -139,7 +140,23 @@ final class GzipStreamFilterTest extends TestCase
         $plain = stream_get_contents($stream);
         fclose($stream);
 
-        static::assertStringContainsString('Lorem', $plain);
+        static::assertStringStartsWith('<p>Lorem ipsum', $plain);
+        static::assertStringEndsWith('afferat. </p>'."\n", $plain);
+    }
+
+    /**
+     * @test
+     */
+    public function regression_gzipped_file_corrupted(): void
+    {
+        $stream = fopen(__DIR__.'/gzipped_file_corrupted.txt.gz', 'r');
+
+        GzipStreamFilter::appendDecompression('gzipped_file.txt', $stream);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessageMatches('/CRC32 checksum failed for gzipped_file.txt/');
+
+        stream_get_contents($stream);
     }
 
     /**
@@ -154,7 +171,8 @@ final class GzipStreamFilterTest extends TestCase
         $plain = stream_get_contents($stream);
         fclose($stream);
 
-        static::assertStringContainsString('Lorem', $plain);
+        static::assertStringStartsWith('<p>Lorem ipsum', $plain);
+        static::assertStringEndsWith('afferat. </p>'."\n", $plain);
     }
 
     /**
@@ -163,7 +181,6 @@ final class GzipStreamFilterTest extends TestCase
     public function prohibit_filename_with_nullbyte(): void
     {
         $originalPlain = uniqid('contents_');
-        GzipStreamFilter::register();
 
         $compressedStream = $this->streamFromContents($originalPlain);
 

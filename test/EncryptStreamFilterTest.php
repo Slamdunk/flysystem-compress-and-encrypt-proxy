@@ -15,6 +15,11 @@ use SlamCompressAndEncryptProxy\EncryptStreamFilter;
  */
 final class EncryptStreamFilterTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        EncryptStreamFilter::register();
+    }
+
     /**
      * @test
      *
@@ -23,7 +28,6 @@ final class EncryptStreamFilterTest extends TestCase
     public function stream_filter_encrypt_stream(string $originalPlain, ?string $additionalOutStream, ?string $additionalInStream): void
     {
         $key = sodium_crypto_secretstream_xchacha20poly1305_keygen();
-        EncryptStreamFilter::register();
 
         $cipherStream = $this->streamFromContents($originalPlain);
         if (null !== $additionalOutStream) {
@@ -69,7 +73,6 @@ final class EncryptStreamFilterTest extends TestCase
     public function detect_file_corruption(): void
     {
         $key = sodium_crypto_secretstream_xchacha20poly1305_keygen();
-        EncryptStreamFilter::register();
 
         $chunkSize = 8192;
         $originalPlain = random_bytes(10 * ($chunkSize - SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_ABYTES));
@@ -99,7 +102,6 @@ final class EncryptStreamFilterTest extends TestCase
     public function consecutive_filtering(): void
     {
         $key = sodium_crypto_secretstream_xchacha20poly1305_keygen();
-        EncryptStreamFilter::register();
 
         $cipherStream1 = $this->streamFromContents('123');
         EncryptStreamFilter::appendEncryption($cipherStream1, $key);
@@ -136,7 +138,6 @@ final class EncryptStreamFilterTest extends TestCase
     {
         $key = base64_decode('Z+Ry4nDufKcJ19pU2pEMgGiac9GBWFjEV18Cpb9jxRM=', true);
         $originalPlain = 'foobar';
-        EncryptStreamFilter::register();
 
         // To recreate assets, uncomment following lines
         // $cipherStream = $this->streamFromContents($content);
