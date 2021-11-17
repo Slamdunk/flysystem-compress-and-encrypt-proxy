@@ -75,10 +75,14 @@ final class AbstractProxyAdapterTest extends FilesystemAdapterTestCase
         $adapter = $this->adapter();
         $this->localAdapter->write('file1.txt', uniqid(), new Config());
         $adapter->write('file2.txt', uniqid(), new Config());
+        $this->localAdapter->write('file3.txt', uniqid(), new Config());
+        $adapter->write('file4.txt', uniqid(), new Config());
 
         $expectedLocal = [
             'file1.txt',
             'file2.txt.foo',
+            'file3.txt',
+            'file4.txt.foo',
         ];
         $actualLocal = [];
         foreach ($this->localAdapter->listContents('/', true) as $storage) {
@@ -90,6 +94,7 @@ final class AbstractProxyAdapterTest extends FilesystemAdapterTestCase
 
         $expectedCustom = [
             'file2.txt',
+            'file4.txt',
         ];
         $actualCustom = [];
         foreach ($adapter->listContents('/', true) as $storage) {
