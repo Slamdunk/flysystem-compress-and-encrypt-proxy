@@ -13,10 +13,10 @@ Compress and Encrypt files and streams before saving them to the final Flysystem
 
 Use composer to install these available packages:
 
-| Package name | Stream filter type | Adapter class |
+| Package name | Stream filter type | `SlamFlysystem\` adatper class |
 |---|---|---|
-|`slam/flysystem-v1encrypt-proxy`|[`XChaCha20-Poly1305`](https://www.php.net/manual/en/function.sodium-crypto-secretstream-xchacha20poly1305-init-push.php) Encryption|`SlamFlysystem\V1Encrypt\V1EncryptProxyAdapter`|
-|`slam/flysystem-gzip-proxy`|[`Gzip`](https://datatracker.ietf.org/doc/html/rfc1952) compression|`SlamFlysystem\Gzip\GzipProxyAdapter`|
+|`slam/flysystem-v1encrypt-proxy`|[`XChaCha20-Poly1305`](https://www.php.net/manual/en/function.sodium-crypto-secretstream-xchacha20poly1305-init-push.php) Encryption|`V1Encrypt\V1EncryptProxyAdapter`|
+|`slam/flysystem-gzip-proxy`|[`Gzip`](https://datatracker.ietf.org/doc/html/rfc1952) compression|`Gzip\GzipProxyAdapter`|
 
 ## Usage
 
