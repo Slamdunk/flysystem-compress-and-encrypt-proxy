@@ -84,6 +84,7 @@ final class AbstractProxyAdapterTest extends FilesystemAdapterTestCase
         foreach ($this->localAdapter->listContents('/', true) as $storage) {
             $actualLocal[] = $storage->path();
         }
+        sort($actualLocal);
 
         static::assertSame($expectedLocal, $actualLocal);
 
@@ -94,6 +95,7 @@ final class AbstractProxyAdapterTest extends FilesystemAdapterTestCase
         foreach ($adapter->listContents('/', true) as $storage) {
             $actualCustom[] = $storage->path();
         }
+        sort($actualCustom);
 
         static::assertSame($expectedCustom, $actualCustom);
     }
