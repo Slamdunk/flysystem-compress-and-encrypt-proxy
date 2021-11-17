@@ -127,6 +127,10 @@ abstract class AbstractProxyAdapter implements FilesystemAdapter
 
         foreach ($remoteList as $content) {
             if ($content instanceof FileAttributes) {
+                if (!str_ends_with($content->path(), static::getRemoteFileExtension())) {
+                    continue;
+                }
+
                 $content = new FileAttributes(
                     substr($content->path(), 0, -\strlen(static::getRemoteFileExtension())),
                     $content->fileSize(),

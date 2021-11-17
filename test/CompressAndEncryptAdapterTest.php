@@ -15,7 +15,6 @@ use SlamCompressAndEncryptProxy\EncryptAdapter;
 use SlamCompressAndEncryptProxy\GzipAdapter;
 
 /**
- * @covers \SlamCompressAndEncryptProxy\AbstractProxyAdapter
  * @covers \SlamCompressAndEncryptProxy\EncryptAdapter
  * @covers \SlamCompressAndEncryptProxy\EncryptStreamFilter
  * @covers \SlamCompressAndEncryptProxy\GzipAdapter
@@ -158,29 +157,6 @@ final class CompressAndEncryptAdapterTest extends FilesystemAdapterTestCase
             $contents = $adapter->read('path.txt');
             $this->assertSame('', $contents);
         });
-    }
-
-    /**
-     * @test
-     */
-    public function deleting_a_directory(): void
-    {
-        $remoteMock = $this->createMock(FilesystemAdapter::class);
-        $adapter = new GzipAdapter(
-            new EncryptAdapter(
-                $remoteMock,
-                EncryptAdapter::generateKey()
-            ),
-        );
-
-        $path = uniqid('path_');
-        $remoteMock
-            ->expects(static::once())
-            ->method('deleteDirectory')
-            ->with(static::identicalTo($path))
-        ;
-
-        $adapter->deleteDirectory($path);
     }
 
     /**
