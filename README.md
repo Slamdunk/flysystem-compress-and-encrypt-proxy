@@ -1,7 +1,7 @@
 # Slam / flysystem-compress-and-encrypt-proxy
 
-[![Latest Stable Version](https://img.shields.io/packagist/v/slam/flysystem-compress-and-encrypt-proxy.svg)](https://packagist.org/packages/slam/flysystem-compress-and-encrypt-proxy)
-[![Downloads](https://img.shields.io/packagist/dt/slam/flysystem-compress-and-encrypt-proxy.svg)](https://packagist.org/packages/slam/flysystem-compress-and-encrypt-proxy)
+[![Latest Stable Version](https://img.shields.io/packagist/v/slam/flysystem-core-proxy.svg)](https://packagist.org/packages/slam/flysystem-core-proxy)
+[![Downloads](https://img.shields.io/packagist/dt/slam/flysystem-core-proxy.svg)](https://packagist.org/packages/slam/flysystem-core-proxy)
 [![Integrate](https://github.com/Slamdunk/flysystem-compress-and-encrypt-proxy/workflows/Integrate/badge.svg?branch=master)](https://github.com/Slamdunk/flysystem-compress-and-encrypt-proxy/actions)
 [![Code Coverage](https://codecov.io/gh/Slamdunk/flysystem-compress-and-encrypt-proxy/coverage.svg?branch=master)](https://codecov.io/gh/Slamdunk/flysystem-compress-and-encrypt-proxy?branch=master)
 [![Type Coverage](https://shepherd.dev/github/Slamdunk/flysystem-compress-and-encrypt-proxy/coverage.svg)](https://shepherd.dev/github/Slamdunk/flysystem-compress-and-encrypt-proxy)
@@ -9,13 +9,14 @@
 
 Compress and Encrypt files and streams before saving them to the final Flysystem destination.
 
-## Installation
+## Available packages
 
-To install with composer run the following command:
+Use composer to install these available packages:
 
-```console
-$ composer require slam/flysystem-compress-and-encrypt-proxy
-```
+| Package name | Stream filter type | Adapter class |
+|---|---|---|
+|`slam/flysystem-v1encrypt-proxy`|Encryption with [`XChaCha20-Poly1305`](https://www.php.net/manual/en/function.sodium-crypto-secretstream-xchacha20poly1305-init-push.php) algo|`SlamCompressAndEncryptProxy\V1Encrypt\V1EncryptProxyAdapter`|
+|`slam/flysystem-gzip-proxy`|Gzip compression|`SlamCompressAndEncryptProxy\Gzip\GzipProxyAdapter`|
 
 ## Usage
 
@@ -59,16 +60,16 @@ A 10 Gb `mysqldump` output can be streamed into a 1 Gb `dump.sql.gz.encrypted` f
 with a 10 Mb RAM footprint of the running php process, and no additional local disk
 space required.
 
-## Compression
+## Why is encryption proxy Versioned?
 
-GZip's `zlib.deflate` and `zlib.inflate` compression filters are used.
+Security is a moving target and we need to make space for future, more secure,
+protocols.
 
-You can opt-out compression by using just the `V1EncryptProxyAdapter`.
+No name and no configurations are intentional: [cipher agility is bad](https://paragonie.com/blog/2019/10/against-agility-in-cryptography-protocols).
 
-## Encryption
-
-[Sodium](https://www.php.net/manual/en/book.sodium.php) extension provides the backend for the
-encrypted stream with [`XChaCha20-Poly1305`](https://www.php.net/manual/en/function.sodium-crypto-secretstream-xchacha20poly1305-init-push.php) algorithm.
+The first time you use an encryption stream, you should use only the latest one.
+If you are already using an encryption stream and a new version is released,
+you are invited to plan the re-encrypt all your assets with the new version.
 
 ## Caveats
 
