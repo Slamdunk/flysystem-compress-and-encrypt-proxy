@@ -72,7 +72,7 @@ jobs:
         with:
           cmd: ls -1 -d src/*/ | jq -nR '[(inputs|split("\n"))[0]]'
 
-  composer-json-lint:
+  composer-json-lint-subdirs:
     name: "Lint composer.json"
 
     needs: [subdirs]
