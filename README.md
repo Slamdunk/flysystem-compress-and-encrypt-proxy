@@ -13,10 +13,10 @@ Compress and Encrypt files and streams before saving them to the final Flysystem
 
 Use composer to install these available packages:
 
-| Package name | Stream filter type | `SlamFlysystem\` adatper class |
+| Package name | Stream filter type | Adatper class |
 |---|---|---|
-|`slam/flysystem-v1encrypt-proxy`|[`XChaCha20-Poly1305`](https://www.php.net/manual/en/function.sodium-crypto-secretstream-xchacha20poly1305-init-push.php) Encryption|`V1Encrypt\V1EncryptProxyAdapter`|
-|`slam/flysystem-gzip-proxy`|[`Gzip`](https://datatracker.ietf.org/doc/html/rfc1952) compression|`Gzip\GzipProxyAdapter`|
+|`slam/flysystem-v1encrypt-proxy`|[`XChaCha20-Poly1305`](https://www.php.net/manual/en/function.sodium-crypto-secretstream-xchacha20poly1305-init-push.php) encryption|`V1EncryptProxyAdapter`|
+|`slam/flysystem-gzip-proxy`|[`Gzip`](https://datatracker.ietf.org/doc/html/rfc1952) compression|`GzipProxyAdapter`|
 
 ## Usage
 
@@ -69,7 +69,7 @@ No name and no configurations are intentional: [cipher agility is bad](https://p
 
 The first time you use an encryption stream, you should use only the latest one.
 If you are already using an encryption stream and a new version is released,
-you are invited to plan the re-encrypt all your assets with the new version.
+you are invited to re-encrypt all your assets with the new version.
 
 ## Caveats
 
