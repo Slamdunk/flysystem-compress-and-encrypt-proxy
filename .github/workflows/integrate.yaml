@@ -16,6 +16,15 @@ jobs:
       matrix:
         php-version:
           - "8.0"
+        subdir:
+          - "./"
+          - "./src/Core/"
+          - "./src/Gzip/"
+          - "./src/V1Encrypt/"
+
+    defaults:
+      run:
+        working-directory: "${{ matrix.subdir }}"
 
     steps:
       - name: "Checkout"
@@ -53,39 +62,6 @@ jobs:
 
       - name: "Check composer.json unused dependencies"
         run: "composer-unused --excludePackage=php"
-
-  subdirs:
-    name: "Generate matrix for subsplit"
-
-    runs-on: "ubuntu-latest"
-
-    outputs:
-      subdirs: ${{ steps.subdirs.outputs.value }}
-
-    steps:
-      - name: "Checkout"
-        uses: "actions/checkout@v2"
-
-      - name: "Gather CI configuration"
-        uses: sergeysova/jq-action@v2
-        id: subdirs
-        with:
-          cmd: ls -1 -d src/*/ | jq -nR '[(inputs|split("\n"))[0]]'
-
-  composer-json-lint-subdirs:
-    name: "Lint composer.json"
-
-    needs: [subdirs]
-
-    runs-on: "ubuntu-latest"
-
-    strategy:
-      fail-fast: false
-      matrix: ${{ fromJSON(needs.subdirs.outputs.subdirs) }}
-
-    steps:
-      - name: "Checkout"
-        uses: "actions/checkout@v2"
 
   # tests:
   #   name: "Tests"
