@@ -16,8 +16,9 @@ use SlamCompressAndEncryptProxy\GzipAdapter;
 
 /**
  * @covers \SlamCompressAndEncryptProxy\EncryptAdapter
- * @covers \SlamCompressAndEncryptProxy\EncryptStreamFilter
+ * @covers \SlamCompressAndEncryptProxy\EncryptStreamFilter::register
  * @covers \SlamCompressAndEncryptProxy\GzipAdapter
+ * @covers \SlamCompressAndEncryptProxy\GzipStreamFilter::register
  *
  * @internal
  */
@@ -97,7 +98,7 @@ final class CompressAndEncryptAdapterTest extends FilesystemAdapterTestCase
 
         $attributes = $adapter->fileSize('path.txt');
         static::assertInstanceOf(FileAttributes::class, $attributes);
-        static::assertSame(57, $attributes->fileSize());
+        static::assertSame(84, $attributes->fileSize());
     }
 
     /**
@@ -190,7 +191,7 @@ final class CompressAndEncryptAdapterTest extends FilesystemAdapterTestCase
         // $adapter->write('/file.txt', $originalPlain, new Config());
         // var_dump(base64_encode(file_get_contents($remoteFilename))); exit;
 
-        $content = base64_decode('Zp1CKRNAdEebRInjHnuJwuG1gI2owWedBVboddwd+sW4AKv/3a112UjHnlpJntUUZgPBStuSFw==', true);
+        $content = base64_decode('LiSeaSq90VHp8dl5fGUjGRC6rdfUP3RR1TxL3sJmjNIgk8dpcAj2sNmqNMfU9JYW1iimCXb1AQmPqxAPFYG8r22wjTNgZfG+W55nmSDg33I6zQ==', true);
         file_put_contents($remoteFilename, $content);
 
         static::assertSame($originalPlain, $adapter->read('/file.txt'));
