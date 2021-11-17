@@ -24,6 +24,18 @@
       <code>hash_update</code>
     </UnusedFunctionCall>
   </file>
+  <file src="test/AbstractProxyAdapterTest.php">
+    <InternalClass occurrences="1">
+      <code>AbstractProxyAdapter</code>
+    </InternalClass>
+    <PropertyNotSetInConstructor occurrences="5">
+      <code>$localAdapter</code>
+      <code>$remoteMock</code>
+      <code>AbstractProxyAdapterTest</code>
+      <code>AbstractProxyAdapterTest</code>
+      <code>AbstractProxyAdapterTest</code>
+    </PropertyNotSetInConstructor>
+  </file>
   <file src="test/CompressAndEncryptAdapterTest.php">
     <PropertyNotSetInConstructor occurrences="4">
       <code>$remoteMock</code>
