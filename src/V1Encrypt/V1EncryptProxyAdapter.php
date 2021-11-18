@@ -39,7 +39,7 @@ final class V1EncryptProxyAdapter extends AbstractProxyAdapter
 
     public static function getRemoteFileExtension(): string
     {
-        return '.encrypted';
+        return '.v1encrypted';
     }
 
     /**
