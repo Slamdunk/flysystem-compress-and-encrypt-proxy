@@ -172,19 +172,17 @@ final class GzipStreamFilter extends php_user_filter
                     : ZLIB_NO_FLUSH
             );
 
-            if ('' === $newBucketData) {
-                continue;
+            if ('' !== $newBucketData) {
+                \assert(\is_resource($this->stream));
+                $newBucket = stream_bucket_new(
+                    $this->stream,
+                    $this->header.$newBucketData
+                );
+                $consumed += \strlen($data);
+                stream_bucket_append($out, $newBucket);
+                $this->header = '';
             }
 
-            \assert(\is_resource($this->stream));
-            $newBucket = stream_bucket_new(
-                $this->stream,
-                $this->header.$newBucketData
-            );
-            $consumed += \strlen($data);
-            stream_bucket_append($out, $newBucket);
-
-            $this->header = '';
             if ($closing && '' === $this->buffer) {
                 $crc = hash_final($this->hashContext, true);
                 $newBucketData = $crc[3].$crc[2].$crc[1].$crc[0];
