@@ -1,16 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <files psalm-version="4.12.0@e42bc4a23f67acba28a23bb09c348e2ff38a1d87">
   <file src="src/Gzip/GzipStreamFilter.php">
-    <MissingConstructor occurrences="3">
+    <InvalidPropertyAssignmentValue occurrences="2">
+      <code>deflate_init(ZLIB_ENCODING_RAW)</code>
+      <code>inflate_init(ZLIB_ENCODING_RAW)</code>
+    </InvalidPropertyAssignmentValue>
+    <MissingConstructor occurrences="2">
       <code>$filename</code>
-      <code>$id</code>
       <code>$mode</code>
     </MissingConstructor>
+    <PossiblyInvalidArgument occurrences="2">
+      <code>$this-&gt;deflateContext</code>
+      <code>$this-&gt;inflateContext</code>
+    </PossiblyInvalidArgument>
     <UndefinedThisPropertyFetch occurrences="2">
       <code>$this-&gt;stream</code>
       <code>$this-&gt;stream</code>
     </UndefinedThisPropertyFetch>
-    <UnusedFunctionCall occurrences="1">
+    <UnusedFunctionCall occurrences="2">
+      <code>hash_update</code>
       <code>hash_update</code>
     </UnusedFunctionCall>
   </file>
@@ -49,8 +57,7 @@
       <code>GzipStreamFilterTest</code>
       <code>GzipStreamFilterTest</code>
     </PropertyNotSetInConstructor>
-    <UnusedFunctionCall occurrences="4">
-      <code>stream_get_contents</code>
+    <UnusedFunctionCall occurrences="3">
       <code>stream_get_contents</code>
       <code>stream_get_contents</code>
       <code>stream_get_contents</code>

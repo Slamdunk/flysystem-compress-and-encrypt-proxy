@@ -104,33 +104,6 @@ final class GzipStreamFilterTest extends TestCase
     /**
      * @test
      */
-    public function detect_file_size_corruption(): void
-    {
-        $originalPlain = uniqid('contents_');
-
-        $compressedStream = $this->streamFromContents($originalPlain);
-        GzipStreamFilter::appendCompression('file.txt', $compressedStream);
-        $compressed = stream_get_contents($compressedStream);
-        fclose($compressedStream);
-        static::assertNotSame($originalPlain, $compressed);
-
-        // Nullify size bytes
-        $compressed[-4] = "\x00";
-        $compressed[-3] = "\x00";
-        $compressed[-2] = "\x00";
-        $compressed[-1] = "\x00";
-
-        $plainStream = $this->streamFromContents($compressed);
-        GzipStreamFilter::appendDecompression('file.txt', $plainStream);
-
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessageMatches('/File size differs for file.txt/');
-        stream_get_contents($plainStream);
-    }
-
-    /**
-     * @test
-     */
     public function regression_gzipped_file(): void
     {
         $stream = fopen(__DIR__.'/gzipped_file.txt.gz', 'r');
@@ -142,6 +115,22 @@ final class GzipStreamFilterTest extends TestCase
 
         static::assertStringStartsWith('<p>Lorem ipsum', $plain);
         static::assertStringEndsWith('afferat. </p>'."\n", $plain);
+
+        $compressedStream = $this->streamFromContents($plain);
+        GzipStreamFilter::appendCompression('gzipped_file.txt', $compressedStream);
+
+        $compressed = stream_get_contents($compressedStream);
+        fclose($compressedStream);
+
+        $originalCompressed = file_get_contents(__DIR__.'/gzipped_file.txt.gz');
+
+        $originalSplit = str_split(bin2hex($originalCompressed), 20);
+        $actualSplit = str_split(bin2hex($compressed), 20);
+
+        array_shift($originalSplit);
+        array_shift($actualSplit);
+
+        static::assertSame($originalSplit, $actualSplit);
     }
 
     /**
@@ -173,6 +162,31 @@ final class GzipStreamFilterTest extends TestCase
 
         static::assertStringStartsWith('<p>Lorem ipsum', $plain);
         static::assertStringEndsWith('afferat. </p>'."\n", $plain);
+    }
+
+    /**
+     * @test
+     */
+    public function regression_file_stream(): void
+    {
+        $originalPlain = file_get_contents(__FILE__);
+        $fileHandler = fopen(__FILE__, 'r');
+
+        GzipStreamFilter::appendCompression('file.txt', $fileHandler);
+
+        $compressed = stream_get_contents($fileHandler);
+        fclose($fileHandler);
+        static::assertNotSame($originalPlain, $compressed);
+
+        $plainStream = $this->streamFromContents($compressed);
+        GzipStreamFilter::appendDecompression('file.txt', $plainStream);
+
+        $plain = stream_get_contents($plainStream);
+        fclose($plainStream);
+        static::assertSame(
+            str_split(base64_encode($originalPlain), 64),
+            str_split(base64_encode($plain), 64)
+        );
     }
 
     /**
