@@ -98,7 +98,7 @@ final class CompressAndEncryptAdapterTest extends FilesystemAdapterTestCase
 
         $attributes = $adapter->fileSize('path.txt');
         static::assertInstanceOf(FileAttributes::class, $attributes);
-        static::assertSame(84, $attributes->fileSize());
+        static::assertSame(78, $attributes->fileSize());
     }
 
     /**

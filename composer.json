@@ -15,6 +15,7 @@
         "php": ">=8.0",
         "ext-hash": "*",
         "ext-sodium": "*",
+        "ext-zlib": "*",
         "league/flysystem": "^2.3.1"
     },
     "require-dev": {
