@@ -188,6 +188,7 @@ final class GzipStreamFilter extends php_user_filter
                 $newBucketData = $crc[3].$crc[2].$crc[1].$crc[0];
                 $newBucketData .= pack('V', $this->originalSize);
 
+                \assert(\is_resource($this->stream));
                 $newBucket = stream_bucket_new(
                     $this->stream,
                     $newBucketData

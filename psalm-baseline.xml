@@ -13,7 +13,8 @@
       <code>$this-&gt;deflateContext</code>
       <code>$this-&gt;inflateContext</code>
     </PossiblyInvalidArgument>
-    <UndefinedThisPropertyFetch occurrences="2">
+    <UndefinedThisPropertyFetch occurrences="3">
+      <code>$this-&gt;stream</code>
       <code>$this-&gt;stream</code>
       <code>$this-&gt;stream</code>
     </UndefinedThisPropertyFetch>
