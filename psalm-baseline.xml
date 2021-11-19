@@ -33,6 +33,31 @@
       <code>$this-&gt;stream</code>
     </UndefinedThisPropertyFetch>
   </file>
+  <file src="src/Zip/ZipStreamFilter.php">
+    <InvalidPropertyAssignmentValue occurrences="2">
+      <code>deflate_init(ZLIB_ENCODING_RAW)</code>
+      <code>inflate_init(ZLIB_ENCODING_RAW)</code>
+    </InvalidPropertyAssignmentValue>
+    <MissingConstructor occurrences="4">
+      <code>$crc</code>
+      <code>$filename</code>
+      <code>$mode</code>
+      <code>$time</code>
+    </MissingConstructor>
+    <PossiblyInvalidArgument occurrences="2">
+      <code>$this-&gt;deflateContext</code>
+      <code>$this-&gt;inflateContext</code>
+    </PossiblyInvalidArgument>
+    <UndefinedThisPropertyFetch occurrences="3">
+      <code>$this-&gt;stream</code>
+      <code>$this-&gt;stream</code>
+      <code>$this-&gt;stream</code>
+    </UndefinedThisPropertyFetch>
+    <UnusedFunctionCall occurrences="2">
+      <code>hash_update</code>
+      <code>hash_update</code>
+    </UnusedFunctionCall>
+  </file>
   <file src="test/CompressAndEncryptAdapterTest.php">
     <PropertyNotSetInConstructor occurrences="4">
       <code>$remoteMock</code>
@@ -70,6 +95,22 @@
       <code>V1EncryptStreamFilterTest</code>
     </PropertyNotSetInConstructor>
     <UnusedFunctionCall occurrences="1">
+      <code>stream_get_contents</code>
+    </UnusedFunctionCall>
+  </file>
+  <file src="test/Zip/ZipStreamFilterTest.php">
+    <PossiblyInvalidArgument occurrences="1">
+      <code>$compressed</code>
+    </PossiblyInvalidArgument>
+    <PossiblyInvalidCast occurrences="1">
+      <code>$compressed</code>
+    </PossiblyInvalidCast>
+    <PropertyNotSetInConstructor occurrences="2">
+      <code>ZipStreamFilterTest</code>
+      <code>ZipStreamFilterTest</code>
+    </PropertyNotSetInConstructor>
+    <UnusedFunctionCall occurrences="2">
+      <code>stream_get_contents</code>
       <code>stream_get_contents</code>
     </UnusedFunctionCall>
   </file>

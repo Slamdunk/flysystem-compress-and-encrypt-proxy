@@ -11,6 +11,11 @@
             "target": "git@github.com:Slamdunk/flysystem-gzip-proxy.git"
         },
         {
+            "name": "zip",
+            "directory": "src/Zip",
+            "target": "git@github.com:Slamdunk/flysystem-zip-proxy.git"
+        },
+        {
             "name": "v1encrypt",
             "directory": "src/V1Encrypt",
             "target": "git@github.com:Slamdunk/flysystem-v1encrypt-proxy.git"
