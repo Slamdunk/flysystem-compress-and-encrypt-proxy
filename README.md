@@ -72,6 +72,22 @@ The first time you use an encryption stream, you should use only the latest one.
 If you are already using an encryption stream and a new version is released,
 you are invited to re-encrypt all your assets with the new version.
 
+## Why yet another Zip package?
+
+This one combines Flysystem with a [`php_user_filter`](https://www.php.net/manual/en/class.php-user-filter.php), which allows
+compression without knowing the source nor the destination of the stream.
+
+1. PHP's [`ZipArchive`](https://www.php.net/manual/en/class.ziparchive.php) doesn't support streams for write, and for read
+operations only supports a reading stream after you already saved a local copy of the archive
+2. Flysystem's [`ZipArchive`](https://github.com/thephpleague/flysystem/tree/2.3.1/src/ZipArchive) acts as a big final bucket;
+here instead we transparently zip content from the source to the final bucket, per file.
+3. @maennchen [`ZipStream-PHP`](https://github.com/maennchen/ZipStream-PHP), which is awesome, can stream to Flysystem only
+_after_ the whole archive is written somewhere, see https://github.com/maennchen/ZipStream-PHP/wiki/FlySystem-example; you
+can stream the zip to S3, but not with Flysystem: https://github.com/maennchen/ZipStream-PHP/wiki/Stream-S3
+
+The Zip proxy wasn't possible without copying what we needed from https://github.com/maennchen/ZipStream-PHP, so I strongly recommend
+supporting that package financially if you like theirs or our package for Zip compression.
+
 ## Caveats
 
 ### MIME types detection
