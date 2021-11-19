@@ -22,6 +22,7 @@ jobs:
           - "./src/Core/"
           - "./src/Gzip/"
           - "./src/V1Encrypt/"
+          - "./src/Zip/"
 
     defaults:
       run:

@@ -17,6 +17,7 @@ Use composer to install these available packages:
 |---|---|---|
 |`slam/flysystem-v1encrypt-proxy`|[`XChaCha20-Poly1305`](https://www.php.net/manual/en/function.sodium-crypto-secretstream-xchacha20poly1305-init-push.php) encryption|`V1EncryptProxyAdapter`|
 |`slam/flysystem-gzip-proxy`|[`Gzip`](https://datatracker.ietf.org/doc/html/rfc1952) compression|`GzipProxyAdapter`|
+|`slam/flysystem-zip-proxy`|[`Zip`](https://pkware.cachefly.net/webdocs/casestudies/APPNOTE.TXT) compression|`ZipProxyAdapter`|
 
 ## Usage
 

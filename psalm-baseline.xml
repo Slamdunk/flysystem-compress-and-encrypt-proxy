@@ -33,13 +33,30 @@
       <code>$this-&gt;stream</code>
     </UndefinedThisPropertyFetch>
   </file>
-  <file src="test/CompressAndEncryptAdapterTest.php">
-    <PropertyNotSetInConstructor occurrences="4">
-      <code>$remoteMock</code>
-      <code>CompressAndEncryptAdapterTest</code>
-      <code>CompressAndEncryptAdapterTest</code>
-      <code>CompressAndEncryptAdapterTest</code>
-    </PropertyNotSetInConstructor>
+  <file src="src/Zip/ZipStreamFilter.php">
+    <InvalidPropertyAssignmentValue occurrences="2">
+      <code>deflate_init(ZLIB_ENCODING_RAW)</code>
+      <code>inflate_init(ZLIB_ENCODING_RAW)</code>
+    </InvalidPropertyAssignmentValue>
+    <MissingConstructor occurrences="4">
+      <code>$crc</code>
+      <code>$filename</code>
+      <code>$mode</code>
+      <code>$time</code>
+    </MissingConstructor>
+    <PossiblyInvalidArgument occurrences="2">
+      <code>$this-&gt;deflateContext</code>
+      <code>$this-&gt;inflateContext</code>
+    </PossiblyInvalidArgument>
+    <UndefinedThisPropertyFetch occurrences="3">
+      <code>$this-&gt;stream</code>
+      <code>$this-&gt;stream</code>
+      <code>$this-&gt;stream</code>
+    </UndefinedThisPropertyFetch>
+    <UnusedFunctionCall occurrences="2">
+      <code>hash_update</code>
+      <code>hash_update</code>
+    </UnusedFunctionCall>
   </file>
   <file src="test/Core/AbstractProxyAdapterTest.php">
     <InternalClass occurrences="1">
@@ -53,6 +70,15 @@
       <code>AbstractProxyAdapterTest</code>
     </PropertyNotSetInConstructor>
   </file>
+  <file src="test/Gzip/GzipProxyAdapterTest.php">
+    <PropertyNotSetInConstructor occurrences="5">
+      <code>GzipProxyAdapterTest</code>
+      <code>GzipProxyAdapterTest</code>
+      <code>GzipProxyAdapterTest</code>
+      <code>GzipProxyAdapterTest</code>
+      <code>GzipProxyAdapterTest</code>
+    </PropertyNotSetInConstructor>
+  </file>
   <file src="test/Gzip/GzipStreamFilterTest.php">
     <PropertyNotSetInConstructor occurrences="2">
       <code>GzipStreamFilterTest</code>
@@ -64,12 +90,60 @@
       <code>stream_get_contents</code>
     </UnusedFunctionCall>
   </file>
+  <file src="test/IntegrationTest.php">
+    <PropertyNotSetInConstructor occurrences="6">
+      <code>$key</code>
+      <code>IntegrationTest</code>
+      <code>IntegrationTest</code>
+      <code>IntegrationTest</code>
+      <code>IntegrationTest</code>
+      <code>IntegrationTest</code>
+    </PropertyNotSetInConstructor>
+    <RedundantPropertyInitializationCheck occurrences="2">
+      <code>$this-&gt;key</code>
+      <code>V1EncryptProxyAdapter::generateKey()</code>
+    </RedundantPropertyInitializationCheck>
+  </file>
+  <file src="test/V1Encrypt/V1EncryptProxyAdapterTest.php">
+    <PropertyNotSetInConstructor occurrences="5">
+      <code>V1EncryptProxyAdapterTest</code>
+      <code>V1EncryptProxyAdapterTest</code>
+      <code>V1EncryptProxyAdapterTest</code>
+      <code>V1EncryptProxyAdapterTest</code>
+      <code>V1EncryptProxyAdapterTest</code>
+    </PropertyNotSetInConstructor>
+  </file>
   <file src="test/V1Encrypt/V1EncryptStreamFilterTest.php">
     <PropertyNotSetInConstructor occurrences="2">
       <code>V1EncryptStreamFilterTest</code>
       <code>V1EncryptStreamFilterTest</code>
     </PropertyNotSetInConstructor>
     <UnusedFunctionCall occurrences="1">
+      <code>stream_get_contents</code>
+    </UnusedFunctionCall>
+  </file>
+  <file src="test/Zip/ZipProxyAdapterTest.php">
+    <PropertyNotSetInConstructor occurrences="5">
+      <code>ZipProxyAdapterTest</code>
+      <code>ZipProxyAdapterTest</code>
+      <code>ZipProxyAdapterTest</code>
+      <code>ZipProxyAdapterTest</code>
+      <code>ZipProxyAdapterTest</code>
+    </PropertyNotSetInConstructor>
+  </file>
+  <file src="test/Zip/ZipStreamFilterTest.php">
+    <PossiblyInvalidArgument occurrences="1">
+      <code>$compressed</code>
+    </PossiblyInvalidArgument>
+    <PossiblyInvalidCast occurrences="1">
+      <code>$compressed</code>
+    </PossiblyInvalidCast>
+    <PropertyNotSetInConstructor occurrences="2">
+      <code>ZipStreamFilterTest</code>
+      <code>ZipStreamFilterTest</code>
+    </PropertyNotSetInConstructor>
+    <UnusedFunctionCall occurrences="2">
+      <code>stream_get_contents</code>
       <code>stream_get_contents</code>
     </UnusedFunctionCall>
   </file>
