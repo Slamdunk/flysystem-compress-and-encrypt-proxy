@@ -11,7 +11,7 @@ use php_user_filter;
 use RuntimeException;
 
 /**
- * Most of the code here was copied by the awesome ZipStream-PHP library.
+ * Most of the code here was copied from the awesome ZipStream-PHP library.
  *
  * @see https://github.com/maennchen/ZipStream-PHP
  * @see https://pkware.cachefly.net/webdocs/casestudies/APPNOTE.TXT
@@ -350,27 +350,28 @@ final class ZipStreamFilter extends php_user_filter
     {
         $fields = [];
         if ($force || $this->originalSize >= 0xFFFFFFFF) {
-            $fields[] = ['P', $this->originalSize];
+            $fields[] = pack('P', $this->originalSize);
         }
         if ($force || $this->compressedSize >= 0xFFFFFFFF) {
-            $fields[] = ['P', $this->compressedSize];
+            $fields[] = pack('P', $this->compressedSize);
         }
 
         if ($this->totalLength >= 0xFFFFFFFF) {
-            $fields[] = ['P', $this->totalLength];  // Offset of local header record
+            // We won't test 4GB data...
+            // @codeCoverageIgnoreStart
+            $fields[] = pack('P', $this->totalLength);  // Offset of local header record
+            // @codeCoverageIgnoreEnd
         }
 
         if ([] !== $fields) {
             array_unshift(
                 $fields,
-                ['v', 0x0001],              // 64 bit extension
-                ['v', \count($fields) * 8]   // Length of data block
+                pack('v', 0x0001),              // 64 bit extension
+                pack('v', \count($fields) * 8)  // Length of data block
             );
         }
 
-        return implode('', array_map(static function (array $field): string {
-            return pack(...$field);
-        }, $fields));
+        return implode('', $fields);
     }
 
     private function unixToDosTime(int $when): int

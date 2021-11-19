@@ -15,11 +15,19 @@
         "@default": true,
         "global-ignoreSourceCodeByRegex": [
             "\\\\assert\\(.+\\);",
-            "\\$consumed ..?= .+;"
+            "\\$consumed ..?= .+;",
+            "(\\$.+ \\.?= )?(pack|unpack)\\('\\w+', .+\\).?",
+            ".*(0xffffffff|\\$this->totalLength|\\$this->originalSize|\\$this->compressedSize|\\$fileFooter|\\$cdrFile|\\$cdr64Eof|\\$cdr64Locator|\\$cdrEof).*",
+            "return \\$d\\['year'\\] << 25 | \\$d\\['mon'\\] << 21 | \\$d\\['mday'\\] << 16 | \\$d\\['hours'\\] << 11 | \\$d\\['minutes'\\] << 5 | \\$d\\['seconds'\\] >> 1;"
         ],
         "ConcatOperandRemoval": {
             "ignoreSourceCodeByRegex": [
                 "\\$newBucketData .= basename\\(\\$this->filename\\) . \"\\\\x00\";"
+            ]
+        },
+        "FalseValue": {
+            "ignoreSourceCodeByRegex": [
+                "\\$footer = \\$this->buildZip64ExtraBlock\\(false\\);"
             ]
         },
         "FunctionCallRemoval": {
@@ -32,14 +40,25 @@
                 "while \\(self::ENCRYPT_READ_BYTES <= \\\\strlen\\(\\$this->buffer\\) || \\$closing\\) {"
             ]
         },
+        "LessThanOrEqualToNegotiation": {
+            "ignoreSourceCodeByRegex": [
+                "while \\(\\$(readChunkSize|writeChunkSize) <= \\\\strlen\\(\\$this->buffer\\) || \\$closing\\) {"
+            ]
+        },
         "LogicalAnd": {
             "ignoreSourceCodeByRegex": [
                 "if \\(\\$closing && '' === \\$this->buffer\\) {"
             ]
         },
+        "NotIdentical": {
+            "ignoreSourceCodeByRegex": [
+                "if \\(\\[\\] !== \\$fields\\) {"
+            ]
+        },
         "TrueValue": {
             "ignoreSourceCodeByRegex": [
-                "self::\\$filterRegistered = true;"
+                "self::\\$filterRegistered = true;",
+                "\\$footer = \\$this->buildZip64ExtraBlock\\(true\\);"
             ]
         },
         "UnwrapSubstr": {

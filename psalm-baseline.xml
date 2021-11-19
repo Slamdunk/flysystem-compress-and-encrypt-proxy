@@ -58,14 +58,6 @@
       <code>hash_update</code>
     </UnusedFunctionCall>
   </file>
-  <file src="test/CompressAndEncryptAdapterTest.php">
-    <PropertyNotSetInConstructor occurrences="4">
-      <code>$remoteMock</code>
-      <code>CompressAndEncryptAdapterTest</code>
-      <code>CompressAndEncryptAdapterTest</code>
-      <code>CompressAndEncryptAdapterTest</code>
-    </PropertyNotSetInConstructor>
-  </file>
   <file src="test/Core/AbstractProxyAdapterTest.php">
     <InternalClass occurrences="1">
       <code>AbstractProxyAdapter</code>
@@ -76,6 +68,15 @@
       <code>AbstractProxyAdapterTest</code>
       <code>AbstractProxyAdapterTest</code>
       <code>AbstractProxyAdapterTest</code>
+    </PropertyNotSetInConstructor>
+  </file>
+  <file src="test/Gzip/GzipProxyAdapterTest.php">
+    <PropertyNotSetInConstructor occurrences="5">
+      <code>GzipProxyAdapterTest</code>
+      <code>GzipProxyAdapterTest</code>
+      <code>GzipProxyAdapterTest</code>
+      <code>GzipProxyAdapterTest</code>
+      <code>GzipProxyAdapterTest</code>
     </PropertyNotSetInConstructor>
   </file>
   <file src="test/Gzip/GzipStreamFilterTest.php">
@@ -89,6 +90,29 @@
       <code>stream_get_contents</code>
     </UnusedFunctionCall>
   </file>
+  <file src="test/IntegrationTest.php">
+    <PropertyNotSetInConstructor occurrences="6">
+      <code>$key</code>
+      <code>IntegrationTest</code>
+      <code>IntegrationTest</code>
+      <code>IntegrationTest</code>
+      <code>IntegrationTest</code>
+      <code>IntegrationTest</code>
+    </PropertyNotSetInConstructor>
+    <RedundantPropertyInitializationCheck occurrences="2">
+      <code>$this-&gt;key</code>
+      <code>V1EncryptProxyAdapter::generateKey()</code>
+    </RedundantPropertyInitializationCheck>
+  </file>
+  <file src="test/V1Encrypt/V1EncryptProxyAdapterTest.php">
+    <PropertyNotSetInConstructor occurrences="5">
+      <code>V1EncryptProxyAdapterTest</code>
+      <code>V1EncryptProxyAdapterTest</code>
+      <code>V1EncryptProxyAdapterTest</code>
+      <code>V1EncryptProxyAdapterTest</code>
+      <code>V1EncryptProxyAdapterTest</code>
+    </PropertyNotSetInConstructor>
+  </file>
   <file src="test/V1Encrypt/V1EncryptStreamFilterTest.php">
     <PropertyNotSetInConstructor occurrences="2">
       <code>V1EncryptStreamFilterTest</code>
@@ -97,6 +121,15 @@
     <UnusedFunctionCall occurrences="1">
       <code>stream_get_contents</code>
     </UnusedFunctionCall>
+  </file>
+  <file src="test/Zip/ZipProxyAdapterTest.php">
+    <PropertyNotSetInConstructor occurrences="5">
+      <code>ZipProxyAdapterTest</code>
+      <code>ZipProxyAdapterTest</code>
+      <code>ZipProxyAdapterTest</code>
+      <code>ZipProxyAdapterTest</code>
+      <code>ZipProxyAdapterTest</code>
+    </PropertyNotSetInConstructor>
   </file>
   <file src="test/Zip/ZipStreamFilterTest.php">
     <PossiblyInvalidArgument occurrences="1">
