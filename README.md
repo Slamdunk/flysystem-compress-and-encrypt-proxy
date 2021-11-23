@@ -45,7 +45,7 @@ $handle = fopen('my-huge-file.txt', 'r');
 $filesystem->writeStream('data.txt', $handle);
 fclose($handle);
 
-// Remotely a data.txt.gz.encrypted file has now been created
+// Remotely a data.txt.gz.v1encrypted file has now been created
 
 // Download a file, with stream
 $handle = $filesystem->readStream('data.txt');
@@ -57,7 +57,7 @@ fclose($handle);
 
 Both write and read operations leverage streams to keep memory usage low.
 
-A 10 Gb `mysqldump` output can be streamed into a 1 Gb `dump.sql.gz.encrypted` file
+A 10 Gb `mysqldump` output can be streamed into a 1 Gb `dump.sql.gz.v1encrypted` file
 with a 10 Mb RAM footprint of the running php process, and no additional local disk
 space required.
 
