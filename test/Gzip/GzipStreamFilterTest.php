@@ -23,6 +23,28 @@ final class GzipStreamFilterTest extends TestCase
     /**
      * @test
      */
+    public function empty_stream(): void
+    {
+        $originalPlain = '';
+
+        $compressedStream = $this->streamFromContents($originalPlain);
+        GzipStreamFilter::appendCompression('file.txt', $compressedStream);
+
+        $compressed = stream_get_contents($compressedStream);
+        fclose($compressedStream);
+        static::assertNotSame($originalPlain, $compressed);
+
+        $plainStream = $this->streamFromContents($compressed);
+        GzipStreamFilter::appendDecompression('file.txt', $plainStream);
+
+        $plain = stream_get_contents($plainStream);
+        fclose($plainStream);
+        static::assertSame($originalPlain, $plain);
+    }
+
+    /**
+     * @test
+     */
     public function stream_filter_gzip_stream(): void
     {
         $originalPlain = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, '

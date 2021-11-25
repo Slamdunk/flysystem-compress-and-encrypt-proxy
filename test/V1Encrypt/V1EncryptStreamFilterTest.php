@@ -56,10 +56,12 @@ final class V1EncryptStreamFilterTest extends TestCase
     public function provideCases(): array
     {
         return [
+            'alone-empty' => ['', null, null],
             'alone-short' => ['foo', null, null],
             'alone-long' => [str_repeat('foo', 10000), null, null],
             'alone-random-short' => [base64_encode(random_bytes(1000)), null, null],
             'alone-random-long' => [base64_encode(random_bytes(100000)), null, null],
+            'zlib-empty' => ['', 'zlib.deflate', 'zlib.inflate'],
             'zlib-short' => ['foo', 'zlib.deflate', 'zlib.inflate'],
             'zlib-long' => [str_repeat('foo', 1000000), 'zlib.deflate', 'zlib.inflate'],
             'zlib-random-short' => [base64_encode(random_bytes(1000)), 'zlib.deflate', 'zlib.inflate'],
@@ -156,6 +158,32 @@ final class V1EncryptStreamFilterTest extends TestCase
         fclose($plainStream);
 
         static::assertSame($originalPlain, $plain);
+    }
+
+    /**
+     * @test
+     */
+    public function regression_file_stream(): void
+    {
+        $key = base64_decode('Z+Ry4nDufKcJ19pU2pEMgGiac9GBWFjEV18Cpb9jxRM=', true);
+        $originalPlain = file_get_contents(__FILE__);
+        $fileHandler = fopen(__FILE__, 'r');
+
+        V1EncryptStreamFilter::appendEncryption($fileHandler, $key);
+
+        $compressed = stream_get_contents($fileHandler);
+        fclose($fileHandler);
+        static::assertNotSame($originalPlain, $compressed);
+
+        $plainStream = $this->streamFromContents($compressed);
+        V1EncryptStreamFilter::appendDecryption($plainStream, $key);
+
+        $plain = stream_get_contents($plainStream);
+        fclose($plainStream);
+        static::assertSame(
+            str_split(base64_encode($originalPlain), 64),
+            str_split(base64_encode($plain), 64)
+        );
     }
 
     /**

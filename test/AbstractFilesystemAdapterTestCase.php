@@ -119,9 +119,9 @@ abstract class AbstractFilesystemAdapterTestCase extends FilesystemAdapterTestCa
         static::assertSame('456', $adapter->read('path2.txt'));
     }
 
-    abstract protected function getRemoteFileSize(): int;
+    abstract public function regression(): void;
 
-    abstract protected function regression(): void;
+    abstract protected function getRemoteFileSize(): int;
 
     protected static function createFilesystemAdapter(): FilesystemAdapter
     {
