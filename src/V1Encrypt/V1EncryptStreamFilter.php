@@ -43,7 +43,7 @@ final class V1EncryptStreamFilter extends php_user_filter
         $resource = stream_filter_append(
             $stream,
             self::FILTERNAME_PREFIX.self::MODE_ENCRYPT,
-            STREAM_FILTER_ALL,
+            STREAM_FILTER_READ,
             $key
         );
         \assert(false !== $resource);
@@ -57,7 +57,7 @@ final class V1EncryptStreamFilter extends php_user_filter
         $resource = stream_filter_append(
             $stream,
             self::FILTERNAME_PREFIX.self::MODE_DECRYPT,
-            STREAM_FILTER_ALL,
+            STREAM_FILTER_READ,
             $key
         );
         \assert(false !== $resource);
@@ -77,7 +77,7 @@ final class V1EncryptStreamFilter extends php_user_filter
             $this->buffer .= $bucket->data;
         }
 
-        if ('' === $this->buffer) {
+        if ('' === $this->buffer && !$closing) {
             return PSFS_FEED_ME;
         }
 
@@ -111,12 +111,18 @@ final class V1EncryptStreamFilter extends php_user_filter
      */
     private function encryptFilter($out, int &$consumed, bool $closing): void
     {
-        $header = '';
         if (null === $this->state) {
             \assert(\is_string($this->key));
             [$this->state, $header] = sodium_crypto_secretstream_xchacha20poly1305_init_push($this->key);
             sodium_memzero($this->key);
             \assert(\is_string($header));
+
+            \assert(\is_resource($this->stream));
+            $newBucket = stream_bucket_new(
+                $this->stream,
+                $header
+            );
+            stream_bucket_append($out, $newBucket);
         }
 
         $readChunkSize = self::CHUNK_SIZE - SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_ABYTES;
@@ -128,7 +134,7 @@ final class V1EncryptStreamFilter extends php_user_filter
             if ($closing && '' === $this->buffer) {
                 $tag = SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_TAG_FINAL;
             }
-            $newBucketData = $header.sodium_crypto_secretstream_xchacha20poly1305_push(
+            $newBucketData = sodium_crypto_secretstream_xchacha20poly1305_push(
                 $this->state,
                 $data,
                 '',
@@ -143,7 +149,6 @@ final class V1EncryptStreamFilter extends php_user_filter
             $consumed += \strlen($data);
             stream_bucket_append($out, $newBucket);
 
-            $header = '';
             if ($closing && '' === $this->buffer) {
                 sodium_memzero($this->state);
 

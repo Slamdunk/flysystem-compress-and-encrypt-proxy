@@ -35,6 +35,11 @@
                 "sodium_memzero\\(.+\\);"
             ]
         },
+        "Identical": {
+            "ignoreSourceCodeByRegex": [
+                "if \\('' === \\$this->buffer && !\\$closing\\) {"
+            ]
+        },
         "LessThanOrEqualTo": {
             "ignoreSourceCodeByRegex": [
                 "while \\(self::ENCRYPT_READ_BYTES <= \\\\strlen\\(\\$this->buffer\\) || \\$closing\\) {"
@@ -64,7 +69,8 @@
         "UnwrapSubstr": {
             "ignoreSourceCodeByRegex": [
                 ".+ = substr\\(\\$this->buffer,( 0,)? \\$(read|write)ChunkSize\\);",
-                "\\$header = substr\\(\\$this->buffer, 0, self::HEADER_LENGTH\\);"
+                "\\$header = substr\\(\\$this->buffer, 0, self::HEADER_LENGTH\\);",
+                "\\$data = substr\\(\\$data, 0, \\$dataDescriptorPosition\\);"
             ]
         }
     },

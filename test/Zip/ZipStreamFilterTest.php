@@ -23,6 +23,28 @@ final class ZipStreamFilterTest extends TestCase
     /**
      * @test
      */
+    public function empty_stream(): void
+    {
+        $originalPlain = '';
+
+        $compressedStream = $this->streamFromContents($originalPlain);
+        ZipStreamFilter::appendCompression('file.txt', $compressedStream);
+
+        $compressed = stream_get_contents($compressedStream);
+        fclose($compressedStream);
+        static::assertNotSame($originalPlain, $compressed);
+
+        $plainStream = $this->streamFromContents($compressed);
+        ZipStreamFilter::appendDecompression('file.txt', $plainStream);
+
+        $plain = stream_get_contents($plainStream);
+        fclose($plainStream);
+        static::assertSame($originalPlain, $plain);
+    }
+
+    /**
+     * @test
+     */
     public function stream_filter_zip_stream(): void
     {
         $originalPlain = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, '
@@ -101,6 +123,21 @@ final class ZipStreamFilterTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessageMatches('/CRC32 checksum failed for file.txt/');
         stream_get_contents($plainStream);
+    }
+
+    /**
+     * @test
+     */
+    public function regression_small_zipped_file(): void
+    {
+        $stream = fopen(__DIR__.'/small.txt.zip', 'r');
+
+        ZipStreamFilter::appendDecompression('small.txt', $stream);
+
+        $plain = stream_get_contents($stream);
+        fclose($stream);
+
+        static::assertSame('foobar', $plain);
     }
 
     /**

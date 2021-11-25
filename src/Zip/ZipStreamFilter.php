@@ -52,6 +52,7 @@ final class ZipStreamFilter extends php_user_filter
     private string $header = '';
     private ?HashContext $hashContext = null;
     private ?DeflateContext $deflateContext = null;
+    private int $inflateMethod;
     private ?InflateContext $inflateContext = null;
 
     private int $originalSize = 0;
@@ -81,7 +82,7 @@ final class ZipStreamFilter extends php_user_filter
         $resource = stream_filter_append(
             $stream,
             self::FILTERNAME_PREFIX.self::MODE_COMPRESS,
-            STREAM_FILTER_ALL,
+            STREAM_FILTER_READ,
             $filename
         );
         \assert(false !== $resource);
@@ -95,7 +96,7 @@ final class ZipStreamFilter extends php_user_filter
         $resource = stream_filter_append(
             $stream,
             self::FILTERNAME_PREFIX.self::MODE_DECOMPRESS,
-            STREAM_FILTER_ALL,
+            STREAM_FILTER_READ,
             $filename
         );
         \assert(false !== $resource);
@@ -115,7 +116,7 @@ final class ZipStreamFilter extends php_user_filter
             $this->buffer .= $bucket->data;
         }
 
-        if ('' === $this->buffer) {
+        if ('' === $this->buffer && !$closing) {
             return PSFS_FEED_ME;
         }
 
@@ -285,9 +286,6 @@ final class ZipStreamFilter extends php_user_filter
     private function decompressFilter($out, int &$consumed, bool $closing): void
     {
         if (null === $this->hashContext) {
-            $this->hashContext = hash_init(self::HASH_ALGORITHM);
-            $this->inflateContext = inflate_init(ZLIB_ENCODING_RAW);
-
             $header = substr($this->buffer, 0, self::HEADER_LENGTH);
             $this->buffer = substr($this->buffer, self::HEADER_LENGTH);
             $arrayHeader = unpack('Vhead/vver/vbits/vmethod/Vtime/Vcrc/Vzlen/Vlen/vfilename/vfooter', $header);
@@ -296,6 +294,8 @@ final class ZipStreamFilter extends php_user_filter
                 throw new RuntimeException('Stream is not Zip');
             }
 
+            \assert(\is_int($arrayHeader['method']));
+            $this->inflateMethod = $arrayHeader['method'];
             \assert(\is_int($arrayHeader['filename']));
             $this->buffer = substr($this->buffer, $arrayHeader['filename']);
             \assert(\is_int($arrayHeader['footer']));
@@ -303,6 +303,11 @@ final class ZipStreamFilter extends php_user_filter
 
             \assert(\is_int($arrayHeader['crc']));
             $this->crc = $arrayHeader['crc'];
+
+            $this->hashContext = hash_init(self::HASH_ALGORITHM);
+            if (self::METHOD_DEFLATE === $this->inflateMethod) {
+                $this->inflateContext = inflate_init(ZLIB_ENCODING_RAW);
+            }
         }
 
         $writeChunkSize = self::CHUNK_SIZE;
@@ -312,18 +317,26 @@ final class ZipStreamFilter extends php_user_filter
 
             if ($closing && '' === $this->buffer) {
                 $dataDescriptorPosition = strpos($data, pack('V', self::DATA_DESCRIPTOR_SIGNATURE));
-                if (false !== $dataDescriptorPosition) {
+                if (false === $dataDescriptorPosition) {
+                    $cdrFilePosition = strpos($data, pack('V', self::CDR_FILE_SIGNATURE));
+                    \assert(false !== $cdrFilePosition);
+                    $data = substr($data, 0, $cdrFilePosition);
+                } else {
                     $unpack = unpack('Vcrc', substr($data, $dataDescriptorPosition + 4, 4));
                     \assert(\is_int($unpack['crc']));
                     $this->crc = $unpack['crc'];
+                    $data = substr($data, 0, $dataDescriptorPosition);
                 }
             }
 
-            $newBucketData = inflate_add(
-                $this->inflateContext,
-                $data,
-                ZLIB_SYNC_FLUSH
-            );
+            $newBucketData = $data;
+            if (self::METHOD_DEFLATE === $this->inflateMethod) {
+                $newBucketData = inflate_add(
+                    $this->inflateContext,
+                    $data,
+                    ZLIB_SYNC_FLUSH
+                );
+            }
 
             hash_update($this->hashContext, $newBucketData);
 

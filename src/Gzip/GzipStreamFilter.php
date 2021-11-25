@@ -71,7 +71,7 @@ final class GzipStreamFilter extends php_user_filter
         $resource = stream_filter_append(
             $stream,
             self::FILTERNAME_PREFIX.self::MODE_COMPRESS,
-            STREAM_FILTER_ALL,
+            STREAM_FILTER_READ,
             $filename
         );
         \assert(false !== $resource);
@@ -85,7 +85,7 @@ final class GzipStreamFilter extends php_user_filter
         $resource = stream_filter_append(
             $stream,
             self::FILTERNAME_PREFIX.self::MODE_DECOMPRESS,
-            STREAM_FILTER_ALL,
+            STREAM_FILTER_READ,
             $filename
         );
         \assert(false !== $resource);
@@ -105,7 +105,7 @@ final class GzipStreamFilter extends php_user_filter
             $this->buffer .= $bucket->data;
         }
 
-        if ('' === $this->buffer) {
+        if ('' === $this->buffer && !$closing) {
             return PSFS_FEED_ME;
         }
 

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<files psalm-version="4.12.0@e42bc4a23f67acba28a23bb09c348e2ff38a1d87">
+<files psalm-version="4.13.1@5cf660f63b548ccd4a56f62d916ee4d6028e01a3">
   <file src="src/Gzip/GzipStreamFilter.php">
     <InvalidPropertyAssignmentValue occurrences="2">
       <code>deflate_init(ZLIB_ENCODING_RAW)</code>
@@ -28,7 +28,8 @@
       <code>$key</code>
       <code>$mode</code>
     </MissingConstructor>
-    <UndefinedThisPropertyFetch occurrences="2">
+    <UndefinedThisPropertyFetch occurrences="3">
+      <code>$this-&gt;stream</code>
       <code>$this-&gt;stream</code>
       <code>$this-&gt;stream</code>
     </UndefinedThisPropertyFetch>
@@ -38,9 +39,10 @@
       <code>deflate_init(ZLIB_ENCODING_RAW)</code>
       <code>inflate_init(ZLIB_ENCODING_RAW)</code>
     </InvalidPropertyAssignmentValue>
-    <MissingConstructor occurrences="4">
+    <MissingConstructor occurrences="5">
       <code>$crc</code>
       <code>$filename</code>
+      <code>$inflateMethod</code>
       <code>$mode</code>
       <code>$time</code>
     </MissingConstructor>
@@ -91,18 +93,13 @@
     </UnusedFunctionCall>
   </file>
   <file src="test/IntegrationTest.php">
-    <PropertyNotSetInConstructor occurrences="6">
-      <code>$key</code>
+    <PropertyNotSetInConstructor occurrences="5">
       <code>IntegrationTest</code>
       <code>IntegrationTest</code>
       <code>IntegrationTest</code>
       <code>IntegrationTest</code>
       <code>IntegrationTest</code>
     </PropertyNotSetInConstructor>
-    <RedundantPropertyInitializationCheck occurrences="2">
-      <code>$this-&gt;key</code>
-      <code>V1EncryptProxyAdapter::generateKey()</code>
-    </RedundantPropertyInitializationCheck>
   </file>
   <file src="test/V1Encrypt/V1EncryptProxyAdapterTest.php">
     <PropertyNotSetInConstructor occurrences="5">
