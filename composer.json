@@ -16,12 +16,12 @@
         "ext-hash": "*",
         "ext-sodium": "*",
         "ext-zlib": "*",
-        "league/flysystem": "^2.3.1"
+        "league/flysystem": "^2.3.2"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^v3.3.2",
         "infection/infection": "^0.25.3",
-        "league/flysystem-adapter-test-utilities": "^2.3.1",
+        "league/flysystem-adapter-test-utilities": "^2.3.2",
         "malukenho/mcbumpface": "^1.1.5",
         "phpunit/phpunit": "^9.5.10",
         "vimeo/psalm": "^4.13.1"
