@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace SlamFlysystem\Test;
 
 use League\Flysystem\AdapterTestUtilities\FilesystemAdapterTestCase;
-use League\Flysystem\Config;
 use League\Flysystem\FileAttributes;
 use League\Flysystem\FilesystemAdapter;
 use League\Flysystem\Local\LocalFilesystemAdapter;
@@ -61,49 +60,6 @@ abstract class AbstractFilesystemAdapterTestCase extends FilesystemAdapterTestCa
     public function fetching_the_mime_type_of_an_svg_file(): void
     {
         static::markTestSkipped('It\'s up to the developer choosing if relying or not to this functionality');
-    }
-
-    /**
-     * Delete this test once https://github.com/thephpleague/flysystem/pull/1375 is released.
-     *
-     * @test
-     */
-    public function writing_a_file_with_a_stream(): void
-    {
-        $this->runScenario(function () {
-            $adapter = $this->adapter();
-            $writeStream = stream_with_contents('contents');
-            self::assertIsResource($writeStream);
-
-            $adapter->writeStream('path.txt', $writeStream, new Config());
-            fclose($writeStream);
-            $fileExists = $adapter->fileExists('path.txt');
-
-            $this->assertTrue($fileExists);
-        });
-    }
-
-    /**
-     * Delete this test once https://github.com/thephpleague/flysystem/pull/1375 is released.
-     *
-     * @test
-     */
-    public function writing_a_file_with_an_empty_stream(): void
-    {
-        $this->runScenario(function () {
-            $adapter = $this->adapter();
-            $writeStream = stream_with_contents('');
-            self::assertIsResource($writeStream);
-
-            $adapter->writeStream('path.txt', $writeStream, new Config());
-            fclose($writeStream);
-            $fileExists = $adapter->fileExists('path.txt');
-
-            $this->assertTrue($fileExists);
-
-            $contents = $adapter->read('path.txt');
-            $this->assertSame('', $contents);
-        });
     }
 
     /**
