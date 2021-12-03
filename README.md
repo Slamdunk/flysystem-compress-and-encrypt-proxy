@@ -9,6 +9,10 @@
 
 Compress and Encrypt files and streams before saving them to the final Flysystem destination.
 
+All the magic here is [`php_user_filter`](https://www.php.net/manual/en/class.php-user-filter.php):
+everything happens on streams on the fly, chunk by chunk, with no impact on local disk and almost
+zero overhead on RAM.
+
 ## Available packages
 
 Use composer to install these available packages:
