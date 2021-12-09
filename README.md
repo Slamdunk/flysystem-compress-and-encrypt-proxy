@@ -28,13 +28,13 @@ Use composer to install these available packages:
 ```php
 use SlamFlysystem\Gzip\GzipProxyAdapter;
 use SlamFlysystem\V1Encrypt\V1EncryptProxyAdapter;
-use League\Flysystem\AwsS3V3\AwsS3V3Adapter;
+use League\Flysystem\Local\LocalFilesystemAdapter;
 
 // Create a strong key and save it somewhere
 $key = V1EncryptProxyAdapter::generateKey();
 
-// Create the final FilesystemAdapter, for example Aws S3
-$remoteAdapter = new AwsS3V3Adapter(/* ... */);
+// Create the final FilesystemAdapter
+$remoteAdapter = new LocalFilesystemAdapter(/* ... */);
 
 $adapter = new GzipProxyAdapter(new V1EncryptProxyAdapter(
     $remoteAdapter,
@@ -64,6 +64,36 @@ Both write and read operations leverage streams to keep memory usage low.
 A 10 Gb `mysqldump` output can be streamed into a 1 Gb `dump.sql.gz.v1encrypted` file
 with a 10 Mb RAM footprint of the running php process, and no additional local disk
 space required.
+
+### Upload on AWS fails, why??
+
+In order to upload a file to AWS it is required to specify payload's `content-length` and
+`hash` within headers, before sending the payload itself.
+This requirement conflicts with the dynamic nature of streams that this library edits
+_on-the-fly_.
+
+You can solve this issue by buffering the payload in a local file before the upload;
+for this purpose you can use [`slam/flysystem-local-cache-proxy`](https://github.com/slamdunk/flysystem-local-cache-proxy),
+which also acts as a local cache to speed up further reads:
+
+```php
+use SlamFlysystem\Gzip\GzipProxyAdapter;
+use SlamFlysystem\V1Encrypt\V1EncryptProxyAdapter;
+use SlamFlysystem\LocalCache\LocalCacheProxyAdapter;
+use League\Flysystem\AsyncAwsS3\AsyncAwsS3Adapter;
+
+$adapter = 
+    new GzipProxyAdapter(                           // 1st: compress data
+        new V1EncryptProxyAdapter(                  // 2nd: encrypt data
+            new LocalCacheProxyAdapter(             // 3rd: buffer resulting data to a local file
+                new AsyncAwsS3Adapter(/*...*/),     // 4th: upload the data
+                sys_get_temp_dir().'/flysystem'
+            ),
+            $key
+        )
+    )
+;
+```
 
 ## Why is encryption proxy Versioned?
 
