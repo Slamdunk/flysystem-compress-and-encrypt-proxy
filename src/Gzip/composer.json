@@ -1,9 +1,8 @@
 {
     "name": "slam/flysystem-gzip-proxy",
-    "type": "library",
     "description": "FlySystem adapter to Gzip content before sending it to the real adapter",
-    "homepage": "https://github.com/slamdunk/flysystem-compress-and-encrypt-proxy",
     "license": "MIT",
+    "type": "library",
     "authors": [
         {
             "name": "Filippo Tessarotto",
@@ -11,6 +10,7 @@
             "role": "Developer"
         }
     ],
+    "homepage": "https://github.com/slamdunk/flysystem-compress-and-encrypt-proxy",
     "require": {
         "php": ">=8.0",
         "ext-hash": "*",

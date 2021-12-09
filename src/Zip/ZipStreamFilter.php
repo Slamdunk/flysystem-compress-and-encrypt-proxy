@@ -390,14 +390,6 @@ final class ZipStreamFilter extends php_user_filter
     private function unixToDosTime(int $when): int
     {
         $d = getdate($when);
-
-        \assert(\is_int($d['year']));
-        \assert(\is_int($d['mon']));
-        \assert(\is_int($d['mday']));
-        \assert(\is_int($d['hours']));
-        \assert(\is_int($d['minutes']));
-        \assert(\is_int($d['seconds']));
-
         $d['year'] -= 1980;
 
         return
